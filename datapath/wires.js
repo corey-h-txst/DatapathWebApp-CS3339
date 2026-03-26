@@ -1,0 +1,1 @@
+// all the wire stuff to connect components and signal animations

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-sclae=1.0" />
+    <title>Datapath Visualizer</title>
+
+    <!--Our stylesheet-->
+    <link rel="stylesheet" href="style.css" />
+
+    <!--Konva.js-->
+    <script defer src="https://unpkg.com/konva@9/konva.min.js"></script>
+
+    <!--App entry point-->
+    <script type="module" defer src="src/main.js"></script>
+</head>
+
+<body>
+    
+    <!--Top navigation bar to add links if other pages are added-->
+    <header class="topbar">
+        <span class="topbar__title">Datapath Visualizer</span>
+        <nav class="topbar__nav">
+        </nav>
+        <!--Placeholder for pages-->
+        </nav>
+    </header>
+
+    <!--Layout with sidebar on left and canvas on right-->
+    <div class="layout">
+        <!--Sidebar controls and component info go here-->
+        <aside class="sidebar">
+            <!--Panels added here-->
+        </aside>
+
+        <!--Konva inject a canvas into this div-->
+        <main id="canvas-container" class="canvas-wrapper"></main>
+    </div>
+
+</body>
+</html>
