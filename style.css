@@ -3,15 +3,12 @@
     --color-surface:   #13161e;   /* sidebar and panel backgrounds  */
     --color-border:    #252838;   /* borders and dividers           */
     --color-accent:    #00d4aa;   /* highlights, active elements    */
- 
     --color-text:      #e8eaf0;   /* main text                      */
     --color-text-dim:  #8b8fa8;   /* secondary / label text         */
- 
     --color-signal-active:   #00d4aa;
     --color-signal-inactive: #2a2e40;
     --color-signal-data:     #4da6ff;
     --color-signal-control:  #f5a623;
-
     --topbar-height: 56px;
     --sidebar-width: 280px;
 }
@@ -31,6 +28,19 @@ body {
     overflow: hidden;
 }
 
+button {
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background-color: #00c49f;
+}
+
 a { color: inherit; text-decoration: none; }
 ul { list-style: none; }
 button { background: none; border: none; cursor: pointer; font: inherit; color: inherit; }
@@ -40,12 +50,10 @@ position: fixed;
     top: 0; left: 0; right: 0;
     height: var(--topbar-height);
     z-index: 100;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 24px;
-
     background-color: var(--color-surface);
     border-bottom: 1px solid var(--color-border);
 }
@@ -92,7 +100,6 @@ position: fixed;
     position: relative;
     overflow: hidden;
     background-color: var(--color-bg);
-    
     background-image: radial-gradient(circle, var(--color-border) 1px, transparent 1px);
     background-size: 24px 24px;
 }
@@ -116,3 +123,19 @@ position: fixed;
     padding-bottom: 8px;
     border-bottom: 1px solid var(--color-border);
 }
+
+.sidebar {
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.canvas-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-text-dim);
+    font-size: 16px;
+    text-align: center;
+}
+    
