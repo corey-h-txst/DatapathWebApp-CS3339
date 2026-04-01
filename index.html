@@ -2,40 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-sclae=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Datapath Visualizer</title>
-
     <!--Our stylesheet-->
     <link rel="stylesheet" href="style.css" />
-
     <!--Konva.js-->
     <script defer src="https://unpkg.com/konva@9/konva.min.js"></script>
-
     <!--App entry point-->
     <script type="module" defer src="src/main.js"></script>
 </head>
-
 <body>
-    
-    <!--Top navigation bar to add links if other pages are added-->
+    <!--Top navigation bar-->
     <header class="topbar">
         <span class="topbar__title">Datapath Visualizer</span>
         <nav class="topbar__nav">
-        </nav>
-        <!--Placeholder for pages-->
+            <a href="#" class="active">Simulator</a>
+            <a href="#">Learn</a>
+            <a href="#">About</a>
         </nav>
     </header>
-
     <!--Layout with sidebar on left and canvas on right-->
     <div class="layout">
         <!--Sidebar controls and component info go here-->
         <aside class="sidebar">
-            <!--Panels added here-->
+            <!-- Controls -->
+            <section class="panel" id="controls-panel">
+                <h2 class="panel__heading">Simulation Controls</h2>
+                <button id="run-btn">Run</button>
+                <button id="step-btn">Step</button>
+                <button id="reset-btn">Reset</button>
+            </section>
+            <!-- Instruction Display -->
+            <section class="panel" id="instruction-panel">
+                <h2 class="panel__heading">Current Instruction</h2>
+                <p id="instruction-text">No instruction loaded</p>
+            </section>
+            <!-- Explanation -->
+            <section class="panel" id="explanation-panel">
+                <h2 class="panel__heading">Explanation</h2>
+                <p id="explanation-text">
+                    Select an instruction to begin learning how the datapath works.
+                </p>
+            </section>
+            <!-- Component Info -->
+            <section class="panel" id="component-panel">
+                <h2 class="panel__heading">Component Info</h2>
+                <p id="component-info">
+                    Click on a component in the datapath to learn more about it.
+                </p>
+            </section>
         </aside>
-
         <!--Konva inject a canvas into this div-->
-        <main id="canvas-container" class="canvas-wrapper"></main>
+        <main class="canvas-wrapper">
+            <!-- Canvas for Konva -->
+            <div id="canvas-container"></div>
+            <!-- Overlay UI -->
+            <div class="canvas-overlay">
+                <p>Datapath Visualization Area</p>
+            </div>
+        </main>
     </div>
-
 </body>
 </html>
