@@ -77,7 +77,6 @@ position: fixed;
  
 .topbar__nav a:hover   { background-color: var(--color-border); color: var(--color-text); }
 .topbar__nav a.active  { color: var(--color-accent); }
- 
 
 .layout {
     margin-top: var(--topbar-height);
@@ -103,7 +102,6 @@ position: fixed;
     background-image: radial-gradient(circle, var(--color-border) 1px, transparent 1px);
     background-size: 24px 24px;
 }
- 
  
 .panel {
     border: 1px solid var(--color-border);
