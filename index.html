@@ -26,6 +26,14 @@
         <!--Sidebar controls and component info go here-->
         <aside class="sidebar">
             <!--Panels added here-->
+            <section class="panel">
+                <h2 class="panel__heading">Mode</h2>
+
+                <div class="mode-toggle" id="mode-toggle-container">
+                    <div class="toggle-slider"></div> <button id="learn-toggle" class="toggle-btn active">Learn</button>
+                    <button id="quiz-toggle" class="toggle-btn">Quiz</button>
+                </div>
+            </section>
             <!-- Controls-->
             <section class="panel" id="controls-panel">
                 <h2 class="panel__heading">Simulation Controls</h2>
@@ -52,6 +60,17 @@
                     Click on a component in the datapath to learn more about it.
                 </p>
             </section>
+            <section class="panel" id="instruction-types-panel">
+                <h2 class="panel__heading">SELECT INSTRUCTION</h2>
+
+                <div class="instruction-grid">
+                    <button id="alu-btn" class="square-btn alu-color">ALU</button>
+                    <button id="load-btn" class="square-btn load-color">Load</button>
+                    <button id="store-btn" class="square-btn store-color">Store</button>
+                    <button id="branch-btn" class="square-btn branch-color">Branch</button>
+                </div>
+
+            </section>
         </aside>
         <!--Konva inject a canvas into this div-->
         <main class="canvas-wrapper">
@@ -63,5 +82,7 @@
             </div>
         </main>
     </div>
+    <script src="ui/panels.js"></script>
+    <script src="src/main.js" type="module"></script>
 </body>
 </html>

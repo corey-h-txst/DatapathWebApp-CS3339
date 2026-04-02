@@ -136,4 +136,106 @@ position: fixed;
     font-size: 16px;
     text-align: center;
 }
+
+.instruction-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.square-btn {
+    aspect-ratio: 1 / 1;
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.square-btn:hover {
+    filter: brightness(0.5);
+}
+
+.square-btn.active {
+    opacity: 1 !important;
+    transform: scale(1.05);
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.square-btn.dimmed {
+    opacity: 0.3;
+    transform: scale(0.95);
+}
+/* Container for the toggle switch */
+.mode-toggle {
+    position: relative; /* Crucial so the slider stays inside */
+    display: flex;
+    background-color: #1a1a24;
+    border-radius: 8px;
+    border: 1px solid #333;
+    margin-bottom: 20px;
+    padding: 4px; /* Adds that nice iOS-style inner gap */
+}
+
+/* The new sliding block */
+.toggle-slider {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc(50% - 4px); /* Covers exactly one button */
+    background-color: #E0B149; /* Your gold color */
+    border-radius: 6px;
+    /* This cubic-bezier creates that distinct snappy, smooth iOS slide */
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 0;
+}
+
+/* Base styling for the buttons */
+.toggle-btn {
+    flex: 1;
+    padding: 8px 0;
+    background: none !important; /* Overrides global buttons so the slider shows through */
+    border: none;
+    color: #888;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative; /* Keeps the text sitting on top of the slider */
+    z-index: 1;
+    transition: color 0.3s ease;
+}
+
+/* Only change the text color when active now, not the background */
+.toggle-btn.active {
+    color: #ffffff;
+}
+
+/* The magic class we add via JS to slide the block to the right */
+.mode-toggle.quiz-mode .toggle-slider {
+    transform: translateX(100%);
+}
+
+/* Styling for interactive SVG components */
+.datapath-component {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Make the component pop slightly and glow when hovered */
+.datapath-component:hover polygon {
+    fill: #1d212b; /* Slightly lighter than the surface background */
+    stroke: var(--color-accent); /* Highlight with your cyan accent color */
+    stroke-width: 3;
+    filter: drop-shadow(0 0 8px rgba(0, 212, 170, 0.4));
+}
+
+.alu-color { background-color: #E0B149 !important;} /* Gold/Yellow */
+.load-color { background-color: #4CAF50 !important;} /* Green */
+.store-color { background-color: #2196F3 !important;} /* Blue */
+.branch-color { background-color: #9C27B0 !important;} /* Purple */
     
