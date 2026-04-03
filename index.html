@@ -6,10 +6,6 @@
     <title>Datapath Visualizer</title>
     <!--Our stylesheet-->
     <link rel="stylesheet" href="style.css" />
-    <!--Konva.js-->
-    <script defer src="https://unpkg.com/konva@9/konva.min.js"></script>
-    <!--App entry point-->
-    <script type="module" defer src="src/main.js"></script>
 </head>
 <body>
     <!--Top navigation bar-->
@@ -26,6 +22,14 @@
         <!--Sidebar controls and component info go here-->
         <aside class="sidebar">
             <!--Panels added here-->
+            <section class="panel">
+                <h2 class="panel__heading">Mode</h2>
+
+                <div class="mode-toggle" id="mode-toggle-container">
+                    <div class="toggle-slider"></div> <button id="learn-toggle" class="toggle-btn active">Learn</button>
+                    <button id="quiz-toggle" class="toggle-btn">Quiz</button>
+                </div>
+            </section>
             <!-- Controls-->
             <section class="panel" id="controls-panel">
                 <h2 class="panel__heading">Simulation Controls</h2>
@@ -33,35 +37,32 @@
                 <button id="step-btn">Step</button>
                 <button id="reset-btn">Reset</button>
             </section>
-            <!-- Instruction Display-->
-            <section class="panel" id="instruction-panel">
-                <h2 class="panel__heading">Current Instruction</h2>
-                <p id="instruction-text">No instruction loaded</p>
-            </section>
-            <!-- Explanation-->
-            <section class="panel" id="explanation-panel">
-                <h2 class="panel__heading">Explanation</h2>
-                <p id="explanation-text">
-                    Select an instruction to begin learning how the datapath works.
-                </p>
-            </section>
-            <!-- Component Info-->
-            <section class="panel" id="component-panel">
-                <h2 class="panel__heading">Component Info</h2>
-                <p id="component-info">
-                    Click on a component in the datapath to learn more about it.
-                </p>
+            <section class="panel" id="instruction-types-panel">
+                <h2 class="panel__heading">SELECT INSTRUCTION</h2>
+
+                <div class="instruction-grid">
+                    <button id="none-btn"  class="square-btn none-color">None</button>
+                    <button id="alu-btn" class="square-btn alu-color">ALU</button>
+                    <button id="load-btn" class="square-btn load-color">Load</button>
+                    <button id="store-btn" class="square-btn store-color">Store</button>
+                    <button id="branch-btn" class="square-btn branch-color">Branch</button>
+                    <button id="jump-btn"  class="square-btn jump-color">Jump</button>
+                </div>
+
             </section>
         </aside>
-        <!--Konva inject a canvas into this div-->
         <main class="canvas-wrapper">
-            <!-- Canvas for Konva-->
-            <div id="canvas-container"></div>
-            <!-- Overlay UI-->
-            <div class="canvas-overlay">
-                <p>Datapath Visualization Area</p>
-            </div>
-        </main>
-    </div>
-</body>
-</html>
+                <div class="zoom-controls">
+                    <button id="zoom-in">+</button>
+                    <button id="zoom-out">−</button>
+                    <button id="zoom-reset">Reset</button>
+                </div>
+
+                <div id="konva-container"></div>
+            </main>
+        </div>
+        <script src="https://unpkg.com/konva@9/konva.min.js"></script>
+        <script src="ui/panels.js"></script>
+        <script type="module" src="src/main.js"></script>
+    </body>
+    </html>
