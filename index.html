@@ -6,10 +6,6 @@
     <title>Datapath Visualizer</title>
     <!--Our stylesheet-->
     <link rel="stylesheet" href="style.css" />
-    <!--Konva.js-->
-    <script defer src="https://unpkg.com/konva@9/konva.min.js"></script>
-    <!--App entry point-->
-    <script type="module" defer src="src/main.js"></script>
 </head>
 <body>
     <!--Top navigation bar-->
@@ -41,33 +37,16 @@
                 <button id="step-btn">Step</button>
                 <button id="reset-btn">Reset</button>
             </section>
-            <!-- Instruction Display-->
-            <section class="panel" id="instruction-panel">
-                <h2 class="panel__heading">Current Instruction</h2>
-                <p id="instruction-text">No instruction loaded</p>
-            </section>
-            <!-- Explanation-->
-            <section class="panel" id="explanation-panel">
-                <h2 class="panel__heading">Explanation</h2>
-                <p id="explanation-text">
-                    Select an instruction to begin learning how the datapath works.
-                </p>
-            </section>
-            <!-- Component Info-->
-            <section class="panel" id="component-panel">
-                <h2 class="panel__heading">Component Info</h2>
-                <p id="component-info">
-                    Click on a component in the datapath to learn more about it.
-                </p>
-            </section>
             <section class="panel" id="instruction-types-panel">
                 <h2 class="panel__heading">SELECT INSTRUCTION</h2>
 
                 <div class="instruction-grid">
+                    <button id="none-btn"  class="square-btn none-color">None</button>
                     <button id="alu-btn" class="square-btn alu-color">ALU</button>
                     <button id="load-btn" class="square-btn load-color">Load</button>
                     <button id="store-btn" class="square-btn store-color">Store</button>
                     <button id="branch-btn" class="square-btn branch-color">Branch</button>
+                    <button id="jump-btn"  class="square-btn jump-color">Jump</button>
                 </div>
 
             </section>
@@ -79,109 +58,11 @@
                     <button id="zoom-reset">Reset</button>
                 </div>
 
-            <svg id="datapath-svg" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                <g id="viewport" transform="translate(0, 50) scale(1)">
-
-                    <!--Instruction Memory-->
-                    <g id="inst-mem" class="datapath-component" transform="translate(40, 200)">
-                        <rect width="100" height="150" rx="8" fill="var(--color-surface)" stroke="var(--color-signal-data)" stroke-width="2" />
-                        <text fill="var(--color-text)" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
-                            <tspan x="50" y="65">Instruction</tspan>
-                            <tspan x="50" y="85">Memory</tspan>
-                        </text>
-                    </g>
-
-                    <!--Register File-->
-                    <g id="registers" class="datapath-component" transform="translate(280, 200)">
-                        <rect width="100" height="150" rx="8" fill="var(--color-surface)" stroke="var(--color-signal-data)" stroke-width="2" />
-                        <text fill="var(--color-text)" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
-                            <tspan x="50" y="65">Register</tspan>
-                            <tspan x="50" y="85">File</tspan>
-                        </text>
-                    </g>
-
-                    <!--Data Memory-->
-                    <g id="data-mem" class="datapath-component" transform="translate(680, 220)">
-                        <rect width="100" height="150" rx="8" fill="var(--color-surface)" stroke="var(--color-signal-data)" stroke-width="2" />
-                        <text fill="var(--color-text)" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
-                            <tspan x="50" y="65">Data</tspan>
-                            <tspan x="50" y="85">Memory</tspan>
-                        </text>
-                    </g>
-    
-                    <!--ALU-->
-                    <g id="alu" class="datapath-component" transform="translate(500, 210)">
-                        <polygon points="0,0 80,40 80,100 0,140 0,80 20,70 0,60" fill="var(--color-surface)" stroke="var(--color-signal-control)" stroke-width="2" />
-                        <text x="45" y="70" fill="var(--color-text)" font-weight="bold" text-anchor="middle" dominant-baseline="middle">ALU</text>
-                    </g>
-    
-                    <!--Branch Adder-->
-                    <g id="alu-branch-adder" class="datapath-component" transform="translate(550, 25)">
-                        <polygon points="0,0 80,40 80,100 0,140 0,80 20,70 0,60" fill="var(--color-surface)" stroke="var(--color-signal-control)" stroke-width="2" />
-                        <text x="45" y="70" fill="var(--color-text)" font-weight="bold" text-anchor="middle" dominant-baseline="middle">Add</text>
-                    </g>
-    
-                    <!--PC Adder-->
-                    <g id="alu-pc-adder" class="datapath-component" transform="translate(50, 25)">
-                        <polygon points="0,0 80,40 80,100 0,140 0,80 20,70 0,60" fill="var(--color-surface)" stroke="var(--color-signal-control)" stroke-width="2" />
-                        <text x="45" y="70" fill="var(--color-text)" font-weight="bold" text-anchor="middle" dominant-baseline="middle">Add</text>
-                    </g>
-    
-                    <!--Control Unit-->
-                    <g id="control-unit" class="datapath-component" transform="translate(200, 50)">
-                        <circle cx="50" cy="35" r="45" fill="var(--color-surface)" stroke="var(--color-signal-control)" stroke-width="2" />
-                        <text x="50" y="35" fill="var(--color-text)" font-weight="bold" text-anchor="middle" dominant-baseline="middle">Control</text>
-                    </g>
-    
-                    <!--Shift Left-->
-                    <g id="shift-left" class="datapath-component" transform="translate(380, 100)">
-                        <circle cx="40" cy="25" r="35" fill="var(--color-surface)" stroke="var(--color-signal-data)" stroke-width="2" />
-                        <text x="40" y="25" fill="var(--color-text)" font-weight="bold" font-size="13" text-anchor="middle" dominant-baseline="middle">Shift 2</text>
-                    </g>
-    
-                    <!--Sign Extend-->
-                    <g id="sign-extend" class="datapath-component" transform="translate(250, 410)">
-                        <circle cx="50" cy="50" r="50" fill="var(--color-surface)" stroke="var(--color-signal-data)" stroke-width="2" />
-                        <text fill="var(--color-text)" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
-                            <tspan x="50" y="40">Sign</tspan>
-                            <tspan x="50" y="60">Extend</tspan>
-                        </text>
-                    </g>
-    
-                    <!--ALU Control-->
-                    <g id="alu-control" class="datapath-component" transform="translate(480, 420)">
-                        <circle cx="45" cy="25" r="35" fill="var(--color-surface)" stroke="var(--color-signal-control)" stroke-width="2" />
-                        <text x="45" y="25" fill="var(--color-text)" font-weight="bold" text-anchor="middle" dominant-baseline="middle">ALU Ctrl</text>
-                    </g>
-    
-                    <!--MUX RegDst-->
-                    <g id="mux-regdst" class="datapath-component" transform="translate(190, 280)">
-                        <ellipse cx="20" cy="40" rx="20" ry="40" fill="var(--color-surface)" stroke="var(--color-signal-data)" stroke-width="2" />
-                        <text x="20" y="40" fill="var(--color-text)" font-weight="bold" font-size="12" text-anchor="middle" dominant-baseline="middle">MUX</text>
-                    </g>
-    
-                    <!--MUX ALUSrc-->
-                    <g id="mux-alusrc" class="datapath-component" transform="translate(430, 280)">
-                        <ellipse cx="20" cy="40" rx="20" ry="40" fill="var(--color-surface)" stroke="var(--color-signal-data)" stroke-width="2" />
-                        <text x="20" y="40" fill="var(--color-text)" font-weight="bold" font-size="12" text-anchor="middle" dominant-baseline="middle">MUX</text>
-                    </g>
-    
-                    <!--MUX MemToReg-->
-                    <g id="mux-memtoreg" class="datapath-component" transform="translate(830, 250)">
-                        <ellipse cx="20" cy="40" rx="20" ry="40" fill="var(--color-surface)" stroke="var(--color-signal-data)" stroke-width="2" />
-                        <text x="20" y="40" fill="var(--color-text)" font-weight="bold" font-size="12" text-anchor="middle" dominant-baseline="middle">MUX</text>
-                    </g>
-    
-                    <!--MUX PC Src-->
-                    <g id="mux-branch" class="datapath-component" transform="translate(680, 50)">
-                        <ellipse cx="20" cy="40" rx="20" ry="40" fill="var(--color-surface)" stroke="var(--color-signal-data)" stroke-width="2" />
-                        <text x="20" y="40" fill="var(--color-text)" font-weight="bold" font-size="12" text-anchor="middle" dominant-baseline="middle">MUX</text>
-                    </g>
-    
-                </g> </svg>
+                <div id="konva-container"></div>
             </main>
         </div>
+        <script src="https://unpkg.com/konva@9/konva.min.js"></script>
         <script src="ui/panels.js"></script>
-        <script src="src/main.js" type="module"></script>
+        <script type="module" src="src/main.js"></script>
     </body>
     </html>

@@ -267,8 +267,58 @@ position: fixed;
     color: var(--color-accent);
 }
 
-.alu-color { background-color: #E0B149 !important;} /* Gold/Yellow */
+.alu-color { background-color: #E6CC00 !important;} /* Gold/Yellow */
 .load-color { background-color: #4CAF50 !important;} /* Green */
 .store-color { background-color: #2196F3 !important;} /* Blue */
 .branch-color { background-color: #9C27B0 !important;} /* Purple */
-    
+.jump-color { background-color: #F44336 !important;} /* Red */
+.none-color { background-color: #607D8B !important;} /* Gray */
+
+#konva-container {
+    width: 100%;
+    height: 100%;
+}
+
+#component-popup {
+    position: absolute;
+    z-index: 100;
+    min-width: 180px;
+    max-width: 260px;
+    padding: 12px 14px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    pointer-events: auto;
+}
+
+.popup__close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: var(--color-text-dim);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+    line-height: 1;
+}
+
+.popup__close:hover {
+    color: var(--color-text);
+}
+
+.popup__title {
+    margin: 0 20px 6px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.popup__body {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-dim);
+    line-height: 1.5;
+}
