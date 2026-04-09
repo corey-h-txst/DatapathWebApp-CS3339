@@ -12,19 +12,52 @@
     <header class="topbar">
         <span class="topbar__title">Datapath Visualizer</span>
         <nav class="topbar__nav">
-            <a href="#" class="active">Simulator</a>
-            <a href="#">Learn</a>
-            <a href="#">About</a>
+            <a href="#" id="nav-sim">Simulator</a>
+            <a href="#" id="nav-learn">Learn</a>
+            <a href="#" id="nav-about">About</a>
+            <button id="settings-btn">⚙️</button>
         </nav>
     </header>
-    <!--Layout with sidebar on left and canvas on right-->
-    <div class="layout">
+    <!-- HOME -->
+    <div id="home-screen" class="active">
+        <div class="home-container">
+            <h1 class="home-title">Datapath Visualizer</h1>
+            <p class="home-subtitle">
+                Learn how CPU datapaths work through interactive simulation and guided exploration.
+            </p>
+            <div class="home-actions">
+                <button id="start-btn" class="primary-btn">Start Simulator</button>
+                <button id="learn-more-btn" class="secondary-btn">Learn More</button>
+            </div>
+            <div class="home-preview">
+                <div class="preview-box">
+                    Datapath Visualization Preview
+                </div>
+            </div>
+            <div class="home-features">
+                <div class="feature">
+                    <h3>Interactive</h3>
+                    <p>Step through instructions and see signals flow in real time.</p>
+                </div>
+                <div class="feature">
+                    <h3>Learn Mode</h3>
+                    <p>Understand each component with guided explanations.</p>
+                </div>
+                <div class="feature">
+                    <h3>Quiz Mode</h3>
+                    <p>Test your knowledge with challenges.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- SIMULATOR -->
+    <div id="simulator">
+        <div class="layout">
         <!--Sidebar controls and component info go here-->
         <aside class="sidebar">
             <!--Panels added here-->
             <section class="panel">
                 <h2 class="panel__heading">Mode</h2>
-
                 <div class="mode-toggle" id="mode-toggle-container">
                     <div class="toggle-slider"></div> <button id="learn-toggle" class="toggle-btn active">Learn</button>
                     <button id="quiz-toggle" class="toggle-btn">Quiz</button>
@@ -39,7 +72,6 @@
             </section>
             <section class="panel" id="instruction-types-panel">
                 <h2 class="panel__heading">SELECT INSTRUCTION</h2>
-
                 <div class="instruction-grid">
                     <button id="none-btn"  class="square-btn none-color">None</button>
                     <button id="alu-btn" class="square-btn alu-color">ALU</button>
@@ -48,7 +80,6 @@
                     <button id="branch-btn" class="square-btn branch-color">Branch</button>
                     <button id="jump-btn"  class="square-btn jump-color">Jump</button>
                 </div>
-
             </section>
         </aside>
         <main class="canvas-wrapper">
@@ -57,10 +88,45 @@
                     <button id="zoom-out">−</button>
                     <button id="zoom-reset">Reset</button>
                 </div>
-
                 <div id="konva-container"></div>
             </main>
         </div>
+    </div>
+    <!-- LEARN -->
+    <div id="learn-page">
+        <h1>Learn</h1>
+        <p>Explain datapath concepts here.</p>
+    </div>
+    <!-- ABOUT -->
+    <div id="about-page">
+        <h1>About</h1>
+        <p>Info about your project/team.</p>
+    </div>
+    <!-- SETTINGS -->
+    <div id="settings-panel" class="settings-panel">
+        <h3>Settings</h3>
+        <div class="setting-group">
+            <label>Background:</label>
+            <select id="bg-select">
+                <option value="default">Default</option>
+                <option value="black">Black</option>
+                <option value="white">White</option>
+                <option value="custom">Custom Color</option>
+            </select>
+            <input type="color" id="bg-color-picker" value="#0d0f14" style="display:none;">
+        </div>
+        <div class="setting-group">
+            <label>Screen Overlay:</label>
+            <select id="overlay-select">
+                <option value="none">None</option>
+                <option value="black">Blacked Out</option>
+                <option value="white">Whitened Out</option>
+            </select>
+            <input type="range" id="overlay-opacity" min="0" max="100" value="50">
+        </div>
+        <button id="apply-settings">Apply</button>
+        <button id="close-settings">Close</button>
+    </div>
         <script src="https://unpkg.com/konva@9/konva.min.js"></script>
         <script src="ui/panels.js"></script>
         <script type="module" src="src/main.js"></script>
