@@ -7,21 +7,42 @@
  * before any event listeners are attached
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+import { setMode, getMode, startSimulation, resetSimulation } from '../src/state.js';
+import { startTour, endTour } from './tour.js';
+import { startQuiz, endQuiz } from './quiz.js';
+import { aluInstruction } from '../instructions/alu.js';
+import { loadInstruction }   from '../instructions/load.js';
+import { storeInstruction }  from '../instructions/store.js';
+import { branchInstruction } from '../instructions/branch.js';
+import { jumpInstruction }   from '../instructions/jump.js';
 
-    // Element References
+/**
+ * Wires all sidebar button interactions.
+ * Must be called after the DOM has been parsed.
+ */
+export function initPanels() {
+
+    // Element references
     const instructionButtons = document.querySelectorAll('.square-btn');
-    const noneBtn = document.getElementById('none-btn');
-    const learnToggle = document.getElementById('learn-toggle');
-    const quizToggle = document.getElementById('quiz-toggle');
-    const toggleContainer = document.getElementById('mode-toggle-container');
-    const resetBtn = document.getElementById('reset-btn');
+    const noneBtn            = document.getElementById('none-btn');
+    const learnToggle        = document.getElementById('learn-toggle');
+    const quizToggle         = document.getElementById('quiz-toggle');
+    const toggleContainer    = document.getElementById('mode-toggle-container');
+    const resetBtn           = document.getElementById('reset-btn');
 
+    const instructionMap = {
+        'alu-btn':    aluInstruction,
+        'load-btn':   loadInstruction,
+        'store-btn':  storeInstruction,
+        'branch-btn': branchInstruction,
+        'jump-btn':   jumpInstruction,
+        'none-btn':   null,
+    };
 
     /**
-     * Marks one instruction as active and dims all other
-     * 
-     * @param {HTMLElement} activeBtn 
+     * Marks one instruction button as active and dims all others.
+     *
+     * @param {HTMLElement} activeBtn
      */
     function activateButton(activeBtn) {
         instructionButtons.forEach(btn => {
@@ -35,33 +56,54 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 'None' is selected by default
+    // None selected by default
     activateButton(noneBtn);
 
-    // Instruction button highlighting
+    // Instruction button clicks
     instructionButtons.forEach(button => {
-        button.addEventListener('click', () => activateButton(button));
+        button.addEventListener('click', () => {
+            activateButton(button);
+            const instruction = instructionMap[button.id];
+
+            if (!instruction) {
+                resetSimulation();
+                endTour();
+                endQuiz();
+                return;
+            }
+
+            startSimulation(instruction);
+
+            if (getMode() === 'learn') startTour();
+            else startQuiz();
+        });
     });
 
-    // Mode toggle
+    // Mode toggle — learn
     learnToggle.addEventListener('click', () => {
         learnToggle.classList.add('active');
         quizToggle.classList.remove('active');
         toggleContainer.classList.remove('quiz-mode');
-    })
+        setMode('learn');
+    });
 
+    // Mode toggle — quiz
     quizToggle.addEventListener('click', () => {
         quizToggle.classList.add('active');
         learnToggle.classList.remove('active');
-        toggleContainer.classList.add('quiz-mode')
-    })
+        toggleContainer.classList.add('quiz-mode');
+        setMode('quiz');
+    });
 
-    // Reset button
+    // Reset
     resetBtn.addEventListener('click', () => {
         activateButton(noneBtn);
         learnToggle.classList.add('active');
         quizToggle.classList.remove('active');
         toggleContainer.classList.remove('quiz-mode');
-        console.log("UI reset to default state");
-    })
-})
+        setMode('learn');
+        resetSimulation();
+        endTour();
+        endQuiz();
+    });
+}

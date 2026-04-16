@@ -33,15 +33,15 @@ export function initPopup() {
  * @param {string} def.info - popup description
  * @param {string} nativeEvent
  */
-export function showPopup(def, nativeEvent)
-{
+export function showPopup(def, nativeEvent) {
     if(!popupElement) return;
 
     popupElement.querySelector('.popup__title').textContent = def.label;
-    popupElement.querySelector('.popup__body').textContent = def.info;
+    popupElement.querySelector('.popup__body').textContent = def.info ?? '';
 
     popupElement.style.display = 'block';
-    _positionPopup(nativeEvent);
+
+    if (nativeEvent) _positionPopup(nativeEvent);
 }
 
 /**

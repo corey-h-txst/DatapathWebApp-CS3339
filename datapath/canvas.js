@@ -4,7 +4,6 @@
  * Initializes and manages Konva.js stage for Datapath Visualizer
  */
 
-
 // Konva instances
 let stage = null;
 let mainLayer = null;
@@ -176,6 +175,43 @@ function _setupResizeObserver(container) {
         stage.position(_clampPosition(stage.position(), stage.scaleX()));
     });
     ro.observe(container);
+}
+
+/**
+ * Smoothly pans and zooms the stage to frame a component.
+ * 
+ * @param {string} componentId
+ * @param {number} [targetScale=1.4] - zoom level to land on
+ * @param {number} [durationMs=600]
+ */
+export function panToComponent(componentId, targetScale = 1.4, durationMs = 600) {
+    const def = getComponent(componentId);
+    if (!def) return;
+
+    // Find center of the component in canvas space
+    const cx = def.x + (def.width ?? 80) / 2;
+    const cy = def.y + (def.height ?? 80) / 2;
+
+    const clampedScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, targetScale));
+
+    // Where stage needs to be so that point (cx, cy) lands at viewport center
+    const targetPos = _clampPosition({
+        x: stage.width()  / 2 - cx * clampedScale,
+        y: stage.height() / 2 - cy * clampedScale,
+    }, clampedScale);
+
+    // Tween both position and scale simultaneously
+    const tween = new Konva.Tween({
+        node: stage,
+        duration: durationMs / 1000,
+        easing: Konva.Easings.EaseInOut,
+        x: targetPos.x,
+        y: targetPos.y,
+        scaleX: clampedScale,
+        scaleY: clampedScale,
+    });
+
+    tween.play();
 }
 
 // Returns Konva stage instance
