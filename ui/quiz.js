@@ -5,7 +5,8 @@
  */
 
 import { getCurrentStep, advance, isFinished } from '../src/state.js';
-import { panToComponent } from '../datapath/canvas.js';
+import { panToPoint } from '../datapath/canvas.js';
+import { getComponent } from '../datapath/components.js';
 import { showPopup, hidePopup } from './popup.js';
 
 export function startQuiz() { _renderCurrentStep(); }
@@ -15,10 +16,9 @@ export function endQuiz() {
     // TODO: show score/completion
 }
 
-function _renderCurrentStep() {
-    const step = getCurrentStep();
+export function renderQuizStep(step) {
     if (!step) return;
-    
+
     const def = getComponent(step.componentId);
     if (def) {
         const cx = def.x + (def.width ?? 80) / 2;
@@ -26,7 +26,20 @@ function _renderCurrentStep() {
         panToPoint(cx, cy);
     }
 
-    showPopup({ label: step.quiz.question, info: null, quiz: step.quiz }, null);
+    showPopup(
+        {
+            label: step.quiz.question,
+            info: null,
+            quiz: step.quiz
+        },
+        null
+    );
+}
+
+function renderCurrentStep() {
+    const step = getCurrentStep();
+    if (!step) return;
+    renderQuizStep(step);
 }
 
 /**

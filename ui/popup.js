@@ -5,6 +5,9 @@
  */
 
 let popupElement = null;
+let allowComponentPopup = true;
+
+export function setComponentPopupsEnabled(enabled) { allowComponentPopup = enabled; }
 
 /**
  * Creates popup div and appends it to .canvas-wrapper.
@@ -35,6 +38,7 @@ export function initPopup() {
  */
 export function showPopup(def, nativeEvent) {
     if(!popupElement) return;
+    if(!allowComponentPopup) return;
 
     popupElement.querySelector('.popup__title').textContent = def.label;
     popupElement.querySelector('.popup__body').textContent = def.info ?? '';

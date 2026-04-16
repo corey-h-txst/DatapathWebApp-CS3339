@@ -5,10 +5,11 @@
  */
 
 import { getCurrentStep, advance, isFinished } from '../src/state.js';
-import { panToComponent } from '../datapath/canvas.js';
+import { panToPoint } from '../datapath/canvas.js';
+import { getComponent } from '../datapath/components.js';
 import { showPopup, hidePopup } from './popup.js';
 
-export function startTour() { _renderCurrentStep(); }
+export function startTour() { renderCurrentStep(); }
 
 export function nextTourStep() {
     if (isFinished()) {
@@ -16,7 +17,7 @@ export function nextTourStep() {
         return;
     }
     advance();
-    _renderCurrentStep();
+    renderCurrentStep();
 }
 
 export function endTour() {
@@ -24,10 +25,9 @@ export function endTour() {
     // TODO: show completion message
 }
 
-function _renderCurrentStep() {
-    const step = getCurrentStep();
+export function renderTourStep(step) {
     if (!step) return;
-    
+
     const def = getComponent(step.componentId);
     if (def) {
         const cx = def.x + (def.width ?? 80) / 2;
@@ -35,5 +35,14 @@ function _renderCurrentStep() {
         panToPoint(cx, cy);
     }
 
-    showPopup({ label: step.tour.title, info: step.tour.body }, null);
+    showPopup(
+        { label: step.tour.title, info: step.tour.body },
+        null
+    );
+}
+
+function renderCurrentStep() {
+    const step = getCurrentStep();
+    if (!step) return;
+    renderTourStep(step);
 }

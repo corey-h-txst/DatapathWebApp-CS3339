@@ -322,3 +322,31 @@ position: fixed;
     color: var(--color-text-dim);
     line-height: 1.5;
 }
+
+#run-btn.running {
+    opacity: 0.6;
+    cursor: not-allowed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+#run-btn:disabled {
+    cursor: not-allowed;
+}
+
+.run-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #ff4444;
+    display: inline-block;
+    animation: pulse-dot 1s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.3; transform: scale(0.7); }
+}

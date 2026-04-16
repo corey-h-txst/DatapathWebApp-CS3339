@@ -103,7 +103,7 @@ const COMPONENTS = {
 
     'mux-mem-to-reg' : {
         label: 'Multiplexer (MUX) - Memory to Register',
-        canvasLabel: 'MUX',
+        canvasLabel: 'M\nU\nX',
         shape: 'mux',
         category: 'mux',
         x: 2150, y: 750,
@@ -121,7 +121,7 @@ const COMPONENTS = {
 
     'adder-pc' : {
         label: 'Add',
-        canvasLabel: 'Add',
+        canvasLabel: 'A\nD\nD',
         shape: 'alu',
         category: 'alu',
         x: 400, y: 100,
@@ -139,7 +139,7 @@ const COMPONENTS = {
 
     'adder-branch' : {
         label: 'Add',
-        canvasLabel: 'Add',
+        canvasLabel: 'A\nD\nD',
         shape: 'alu',
         category: 'alu',
         x: 1650, y: 80,
@@ -291,7 +291,7 @@ function _addRect(group, def) {
  * @param {object} def - component definition from COMPONENTS
  */
 function _addCircle(group, def) {
-    const radius = 40; // Fixed radius for all circle components
+    const radius = 60; // Fixed radius for all circle components
     const diameter = radius * 2;
 
     group.add(new Konva.Circle({
@@ -303,7 +303,7 @@ function _addCircle(group, def) {
         strokeWidth: 2,
     }));
 
-    group.add(_makeLabel(def.canvasLabel, 0, 0, diameter, diameter, 12));
+    group.add(_makeLabel(def.canvasLabel, 0, 0, diameter, diameter, 24));
 }
 
 /**
@@ -320,7 +320,7 @@ function _addALU(group, def) {
         stroke: _strokeForCategory(def.category),
         strokeWidth: 2,
     }));
-    group.add(_makeLabel(def.canvasLabel, 10, 0, 45, 250, 11));
+    group.add(_makeLabel(def.canvasLabel, 10, 0, 45, 250, 30));
 
 }
 
@@ -344,7 +344,7 @@ function _addMUX(group, def) {
         strokeWidth: 2,
     }));
 
-    group.add(_makeLabel(def.canvasLabel, 0, 0, width, height, 12));
+    group.add(_makeLabel(def.canvasLabel, 0, 0, width, height, 30));
 }
 
 
