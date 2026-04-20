@@ -25,7 +25,7 @@ const COMPONENTS = {
         shape: 'rect',
         category: 'register',
         x: 40, y: 700, width: 100, height: 200,
-        info: 'placeholder',
+        info: 'Holds the address of the next instruction to fetch from instruction memory. After each instruction, the PC is usually updated to PC + 4 unless a branch or jump changes the flow of control.',
     },
 
     'instruction-mem' : {
@@ -33,7 +33,7 @@ const COMPONENTS = {
         shape: 'rect',
         category: 'memory',
         x: 275, y: 600, width: 400, height: 400,
-        info: 'placeholder',
+        info: 'Stores the program instructions. Using the address from the PC, it outputs the current instruction so the processor can decode and execute it.',
     },
 
     'mux-reg-dst' : {
@@ -41,7 +41,7 @@ const COMPONENTS = {
         shape: 'mux',
         category: 'mux',
         x: 800, y: 780,
-        info: 'placeholder',
+        info: 'Chooses which register number will be used as the destination register for a write. It typically selects between rt and rd based on the RegDst control signal.',
     },
 
     'reg-file' : {
@@ -49,7 +49,7 @@ const COMPONENTS = {
         shape: 'rect',
         category: 'register',
         x: 900, y: 600, width: 400, height: 400,
-        info: 'placeholder',
+        info: 'Contains the CPU’s registers. It reads values from source registers named in the instruction and can write a result back into a destination register.',
     },
 
     'sign-ext' : {
@@ -57,7 +57,7 @@ const COMPONENTS = {
         shape: 'circle',
         category: 'logic',
         x: 1100, y: 1070,
-        info: 'placeholder',
+        info: 'Takes a smaller immediate value from the instruction and extends it to the full word size while preserving its sign. This is needed for offsets, constants, loads, stores, and branches.',
     },
 
     'mux-alu-src' : {
@@ -65,7 +65,7 @@ const COMPONENTS = {
         shape: 'mux',
         category: 'mux',
         x: 1400, y: 820,
-        info: 'placeholder',
+        info: 'Selects the ALU’s second input. It chooses between register data and the sign-extended immediate value depending on the ALUSrc control signal.',
     },
 
     'alu' : {
@@ -73,7 +73,7 @@ const COMPONENTS = {
         shape: 'alu',
         category: 'alu',
         x: 1500, y: 675,
-        info: 'placeholder',
+        info: 'Performs arithmetic and logic operations such as add, subtract, AND, OR, and comparisons. It is used for instruction execution, address calculation, and branch decisions.',
     },
 
     'alu-control' : {
@@ -81,7 +81,7 @@ const COMPONENTS = {
         shape: 'circle',
         category: 'control',
         x: 1500, y: 1050,
-        info: 'placeholder',
+        info: 'Determines the exact ALU operation to perform. It uses high-level ALUOp control signals together with instruction function bits to tell the ALU what action to take.',
     },
 
     'data-mem' : {
@@ -89,7 +89,7 @@ const COMPONENTS = {
         shape: 'rect',
         category: 'memory',
         x: 1650, y: 600, width: 400, height: 400,
-        info: 'placeholder',
+        info: 'Stores program data. For load instructions it outputs data from memory, and for store instructions it writes register data into memory.',
     },
 
     'mux-mem-to-reg' : {
@@ -97,7 +97,7 @@ const COMPONENTS = {
         shape: 'mux',
         category: 'mux',
         x: 2150, y: 750,
-        info: 'placeholder',
+        info: 'Chooses what value gets written back into the register file. It typically selects between the ALU result and data coming from memory.',
     },
 
     'control' : {
@@ -105,7 +105,7 @@ const COMPONENTS = {
         shape: 'circle',
         category: 'control',
         x: 800, y: 250,
-        info: 'placeholder',
+        info: 'Reads the opcode field of the instruction and generates the main control signals for the datapath, such as RegWrite, MemRead, MemWrite, Branch, MemToReg, ALUSrc, and RegDst.',
     },
 
     'adder-pc' : {
@@ -113,7 +113,8 @@ const COMPONENTS = {
         shape: 'alu',
         category: 'alu',
         x: 400, y: 100,
-        info: 'placeholder',
+        info: 'PC + 4 Adder\n' +
+            'Adds 4 to the current PC value to produce the next sequential instruction address, often written as PC + 4.',
     },
 
     'shift-left-2' : {
@@ -121,7 +122,7 @@ const COMPONENTS = {
         shape: 'circle',
         category: 'logic',
         x: 1400, y: 250,
-        info: 'placeholder',
+        info: 'Shifts the branch immediate value left by 2 bits. This converts the instruction offset into a byte offset for word-aligned branch target addresses.',
     },
 
     'adder-branch' : {
@@ -129,7 +130,7 @@ const COMPONENTS = {
         shape: 'alu',
         category: 'alu',
         x: 1650, y: 80,
-        info: 'placeholder',
+        info: 'Calculates the branch target address by adding PC + 4 to the shifted branch offset.',
     },
 
     'mux-pc-src' : {
@@ -137,7 +138,7 @@ const COMPONENTS = {
         shape: 'mux',
         category: 'mux',
         x: 1850, y: 110,
-        info: 'placeholder',
+        info: 'Chooses the next value for the PC. It usually selects between the normal next address (PC + 4) and a branch target address.',
     },
 };
 
