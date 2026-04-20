@@ -2,15 +2,15 @@
  * panel.js
  * 
  * Manages all sidebar UI interactions for the Datapath Visualizer
- * 
- * All logic is wrapped in DOMContentLoaded to gurantee all elements exist
- * before any event listeners are attached
+ * Owns the run button state machine and wires instruction selection,
+ * mode toggling, simulation start/step/reset, and the finish callback
+ * passed down to tour.js and quiz.js.
  */
 
 import { setMode, getMode, startSimulation, resetSimulation, advance, getCurrentStep } from '../src/state.js';
-import { startTour, endTour, renderTourStep } from './tour.js';
-import { startQuiz, endQuiz, renderQuizStep } from './quiz.js';
-import { setComponentPopupsEnabled } from './popup.js';
+import { startTour, renderTourStep } from './tour.js';
+import { startQuiz, renderQuizStep } from './quiz.js';
+import { hideSimPopup, setComponentPopupsEnabled } from './popup.js';
 import { aluInstruction } from '../instructions/alu.js';
 import { loadInstruction }   from '../instructions/load.js';
 import { storeInstruction }  from '../instructions/store.js';
@@ -80,6 +80,16 @@ export function initPanels() {
         }
     }
 
+    /**
+     * Called when the tour or quiz end card's Done button
+     * is clicked and hides sim popup
+     */
+    function finishSimulation() {
+        hideSimPopup();
+        setComponentPopupsEnabled(true);
+        setRunning(false);  // resets run button UI
+    }
+
     // None selected by default
     activateButton(noneBtn);
 
@@ -99,11 +109,12 @@ export function initPanels() {
         startSimulation(selectedInstruction);
         setComponentPopupsEnabled(false);
         setRunning(true);
-        if (getMode() === 'learn') startTour();
-        else startQuiz();
+        if (getMode() === 'learn') startTour(finishSimulation);
+        else startQuiz(finishSimulation);
     });
 
     // Step simulation forward one cycle
+    // Only active while simulation is running
     stepBtn.addEventListener('click', () => {
         if (!selectedInstruction) return;
         if (!runBtn.disabled) return;
@@ -139,7 +150,7 @@ export function initPanels() {
         setMode('quiz');
     });
 
-    // Reset
+    // Resets page to base state
     resetBtn.addEventListener('click', () => {
         activateButton(noneBtn);
         learnToggle.classList.add('active');
@@ -147,8 +158,7 @@ export function initPanels() {
         toggleContainer.classList.remove('quiz-mode');
         setMode('learn');
         resetSimulation();
-        endTour();
-        endQuiz();
+        hideSimPopup();
         setComponentPopupsEnabled(true);
         setRunning(false);
     });
