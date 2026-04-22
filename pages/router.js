@@ -28,23 +28,23 @@ const routes = {
                     const components = simulatorModules.components;
                     const popup = simulatorModules.popup;
                     if (!canvas?.initCanvas) {
-                        throw new Error("Canvas init missing");
+                        throw new Error("Canvas initializer missing");
                     }
-                    console.log("🎨 Init canvas");
+                    console.log("🎨 Initializing canvas");
                     await new Promise(requestAnimationFrame);
                     await new Promise(requestAnimationFrame);
                     canvas.initCanvas("konva-container");
                     requestAnimationFrame(() => {
-                        console.log("🧩 Init components");
+                        console.log("🧩 Initializing components");
                         components?.initComponents?.();
-                        console.log("💬 Init popup");
+                        console.log("💬 Initializing popup");
                         popup?.initPopup?.();
                         canvas.getStage?.()?.draw();
                         simulatorReady = true;
                         console.log("✅ Simulator READY");
                     });
                 } catch (err) {
-                    console.error("❌ Simulator init error:", err);
+                    console.error("❌ Simulator initializing error:", err);
                     simulatorInitPromise = null;
                     simulatorReady = false;
                 }
