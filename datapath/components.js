@@ -152,7 +152,7 @@ export function initComponents() {
         layer.add(group);
     }
 
-    layer.draw();
+    layer.batchDraw();
     _setupGlobalDismiss();
 }
 
@@ -234,18 +234,21 @@ function _attachInteraction(group, id) {
  * @param {number} fontSize
  * @returns {Konva.Text}
  */
-function _makeLabel(text, x, y, width, height, fontSize=14) {
-    return new Konva.Text({
-        x, y,
-        width, height,
+function _makeLabel(text, x, y, width, height, fontSize = 14) {
+    const label = new Konva.Text({
         text,
         fontSize,
         fontFamily: 'monospace',
-        fonstStyle: 'bold',
+        fontStyle: 'bold',
         fill: 'black',
+        width: width,
         align: 'center',
-        verticalAlign: 'middle',
     });
+    label.position({
+        x: x + (width - label.width()) / 2,
+        y: y + (height - label.height()) / 2,
+    });
+    return label;
 }
 
 /**
@@ -329,7 +332,7 @@ function _addMUX(group, def) {
         strokeWidth: 2,
     }));
 
-    group.add(_makeLabel(def.label, 0, 0, width, height, 12));
+    group.add(_makeLabel(def.label, 0, 0, width, height, 11));
 }
 
 
