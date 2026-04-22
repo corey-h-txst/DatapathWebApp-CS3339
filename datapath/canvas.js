@@ -25,9 +25,9 @@ export function initCanvas(containerId) {
     const container = document.getElementById(containerId);
 
     stage = new Konva.Stage({
-        container: containerId,
-        width: container.clientWidth,
-        height: container.clientHeight,
+        container: document.getElementById(containerId),
+        width: container.getBoundingClientRect().width,
+        height: container.getBoundingClientRect().height,
         draggable: true,
     });
 
