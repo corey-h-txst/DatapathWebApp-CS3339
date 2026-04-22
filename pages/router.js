@@ -31,8 +31,6 @@ const routes = {
                         throw new Error("Canvas initializer missing");
                     }
                     console.log("🎨 Initializing canvas");
-                    await new Promise(requestAnimationFrame);
-                    await new Promise(requestAnimationFrame);
                     canvas.initCanvas("konva-container");
                     requestAnimationFrame(() => {
                         console.log("🧩 Initializing components");
