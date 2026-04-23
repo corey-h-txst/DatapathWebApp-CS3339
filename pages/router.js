@@ -1,117 +1,64 @@
+import { initSimulatorControls } from "./simulator.js";
+
 let simulatorInitPromise = null;
-let simulatorReady = false;
-let simulatorModules = null;
 
 const routes = {
-    home: {
-        el: document.getElementById('home-screen'),
-        init() {},
-        enter() {},
-        leave() {}
-    },
-    sim: {
-        el: document.getElementById('simulator'),
-        async init() {
-            if (simulatorInitPromise) return simulatorInitPromise;
-            simulatorInitPromise = (async () => {
-                try {
-                    console.log("🚀 Initializing Simulator...");
-                    const container = document.getElementById("konva-container");
-                    if (!container) {
-                        throw new Error("Canvas container missing");
-                    }
-                    const rect = container.getBoundingClientRect();
-                    console.log("📐 Container size:", rect);
-                    console.log("⬇️ Loading modules...");
-                    simulatorModules = await loadSimulatorModules();
-                    const canvas = simulatorModules.canvas;
-                    const components = simulatorModules.components;
-                    const popup = simulatorModules.popup;
-                    if (!canvas?.initCanvas) {
-                        throw new Error("Canvas initializer missing");
-                    }
-                    console.log("🎨 Initializing canvas");
-                    canvas.initCanvas("konva-container");
-                    requestAnimationFrame(() => {
-                        console.log("🧩 Initializing components");
-                        components?.initComponents?.();
-                        console.log("💬 Initializing popup");
-                        popup?.initPopup?.();
-                        canvas.getStage?.()?.draw();
-                        simulatorReady = true;
-                        console.log("✅ Simulator READY");
-                    });
-                } catch (err) {
-                    console.error("❌ Simulator initializing error:", err);
-                    simulatorInitPromise = null;
-                    simulatorReady = false;
-                }
-            })();
-            return simulatorInitPromise;
-        },
-        enter() {
-            console.log("➡️ Entered Simulator");
-        },
-        leave() {
-            console.log("⬅️ Left Simulator");
-        }
-    },
-    learn: {
-        el: document.getElementById('learn-page'),
-        init() {},
-        enter() {},
-        leave() {}
-    },
-    about: {
-        el: document.getElementById('about-page'),
-        init() {},
-        enter() {},
-        leave() {}
-    }
+    home: document.getElementById("home-screen"),
+    sim: document.getElementById("simulator"),
+    learn: document.getElementById("learn-page"),
+    about: document.getElementById("about-page"),
 };
 
 const navLinks = {
-    home: document.getElementById('nav-home'),
-    sim: document.getElementById('nav-sim'),
-    learn: document.getElementById('nav-learn'),
-    about: document.getElementById('nav-about'),
+    home: document.getElementById("nav-home"),
+    sim: document.getElementById("nav-sim"),
+    learn: document.getElementById("nav-learn"),
+    about: document.getElementById("nav-about"),
 };
 
-let currentRoute = null;
+async function ensureSimulatorReady() {
+    if (!simulatorInitPromise) {
+        simulatorInitPromise = import("../src/main.js")
+            .then(() => {
+                initSimulatorControls();
+            })
+            .catch((error) => {
+                simulatorInitPromise = null;
+                throw error;
+            });
+    }
+
+    return simulatorInitPromise;
+}
+
 async function navigate(routeName) {
-    const route = routes[routeName];
-    if (!route) return;
-    console.log("➡️ Navigate:", routeName);
-    Object.values(routes).forEach(r => r.el?.classList.remove('active'));
-    Object.values(navLinks).forEach(n => n?.classList.remove('active'));
-    route.el?.classList.add('active');
-    navLinks[routeName]?.classList.add('active');
-    currentRoute = routeName;
-    route.init?.();
-    route.enter?.();
+    const nextRoute = routes[routeName];
+    if (!nextRoute) return;
+
+    Object.values(routes).forEach((route) => route?.classList.remove("active"));
+    Object.values(navLinks).forEach((link) => link?.classList.remove("active"));
+
+    nextRoute.classList.add("active");
+    navLinks[routeName]?.classList.add("active");
+
+    if (routeName === "sim") {
+        await ensureSimulatorReady();
+    }
 }
 
-async function loadSimulatorModules() {
-    console.log("⬇️ Loading canvas...");
-    const canvasModule = await import("../datapath/canvas.js");
-    console.log("✅ canvas loaded");
-    console.log("⬇️ Loading components...");
-    const componentsModule = await import("../datapath/components.js");
-    console.log("✅ components loaded");
-    console.log("⬇️ Loading popup...");
-    const popupModule = await import("../ui/popup.js");
-    console.log("✅ popup loaded");
-    return {
-        canvas: canvasModule,
-        components: componentsModule,
-        popup: popupModule
-    };
-}
+Object.entries(navLinks).forEach(([routeName, link]) => {
+    link?.addEventListener("click", (event) => {
+        event.preventDefault();
+        void navigate(routeName);
+    });
+});
 
-navLinks.home.onclick = () => navigate("home");
-navLinks.sim.onclick = () => navigate("sim");
-navLinks.learn.onclick = () => navigate("learn");
-navLinks.about.onclick = () => navigate("about");
-document.getElementById("start-btn").onclick = () => navigate("sim");
-document.getElementById("learn-more-btn").onclick = () => navigate("learn");
-navigate("home");
+document.getElementById("start-btn")?.addEventListener("click", () => {
+    void navigate("sim");
+});
+
+document.getElementById("learn-more-btn")?.addEventListener("click", () => {
+    void navigate("learn");
+});
+
+void navigate("home");
