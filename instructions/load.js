@@ -1,6 +1,6 @@
-export const storeInstruction = {
-    id: 'store',
-    label: 'Store Instruction',
+export const loadInstruction = {
+    id: 'load',
+    label: 'Load Instruction',
     steps: [
         // Step 1
         {

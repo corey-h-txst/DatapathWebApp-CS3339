@@ -237,36 +237,6 @@ position: fixed;
     filter: drop-shadow(0 0 8px rgba(0, 212, 170, 0.4));
 }
 
-.zoom-controls {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    z-index: 10;
-}
-
-.zoom-controls button {
-    width: 40px;
-    height: 40px;
-    background-color: var(--color-surface);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.zoom-controls button:hover {
-    background-color: var(--color-border);
-    color: var(--color-accent);
-}
-
 .alu-color { background-color: #E6CC00 !important;} /* Gold/Yellow */
 .load-color { background-color: #4CAF50 !important;} /* Green */
 .store-color { background-color: #2196F3 !important;} /* Blue */
@@ -321,4 +291,271 @@ position: fixed;
     font-size: 12px;
     color: var(--color-text-dim);
     line-height: 1.5;
+}
+
+.popup__handle {
+    display: flex;
+    justify-content: flex-end;
+    padding: 4px 6px 2px;
+    background: var(--color-border);
+    border-radius: 8px 8px 0 0;
+    cursor: grab;
+}
+
+.popup__handle:active { cursor: grabbing; }
+
+#run-btn.running {
+    opacity: 0.6;
+    cursor: not-allowed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+#run-btn:disabled {
+    cursor: not-allowed;
+}
+
+.run-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #ff4444;
+    display: inline-block;
+    animation: pulse-dot 1s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.3; transform: scale(0.7); }
+}
+
+/* ── Simulation popup (tour & quiz) ─────────────────────────────── */
+#sim-popup {
+    position: absolute;
+    z-index: 200;
+    width: 340px;
+    min-width: 260px;
+    max-width: 480px;
+    /* height grows with content; scrolls when it hits the max */
+    max-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+    overflow: hidden;          /* children handle their own scroll */
+    user-select: none;
+}
+
+/* Drag handle strip at the top */
+.sim-popup__handle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px 6px;
+    background: var(--color-border);
+    cursor: grab;
+    flex-shrink: 0;
+}
+
+.sim-popup__handle:active { cursor: grabbing; }
+
+.sim-popup__drag-hint {
+    font-size: 10px;
+    color: var(--color-text-dim);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.sim-popup__close {
+    background: none;
+    border: none;
+    color: var(--color-text-dim);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0;
+    line-height: 1;
+}
+
+.sim-popup__close:hover { color: var(--color-text); }
+
+/* Scrollable content area */
+.sim-popup__body {
+    padding: 14px 16px;
+    overflow-y: auto;
+    flex: 1;
+    scrollbar-width: thin;
+}
+
+/* Tour layout */
+.sim-popup__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.sim-popup__text {
+    font-size: 13px;
+    color: var(--color-text-dim);
+    line-height: 1.6;
+}
+
+/* Quiz layout */
+.sim-popup__question {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 14px;
+    line-height: 1.4;
+}
+
+.quiz-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.quiz-choice {
+    width: 100%;
+    text-align: left;
+    padding: 9px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.quiz-choice:hover:not(:disabled) {
+    border-color: var(--color-accent);
+    background: #1a1f2e;
+}
+
+.quiz-choice.correct {
+    border-color: #4caf50;
+    background: rgba(76, 175, 80, 0.15);
+    color: #4caf50;
+}
+
+.quiz-choice.incorrect {
+    border-color: #f44336;
+    background: rgba(244, 67, 54, 0.12);
+    color: #f44336;
+}
+
+.quiz-choice:disabled { cursor: default; }
+
+.quiz-feedback {
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    min-height: 18px;
+}
+
+.quiz-feedback.correct  { color: #4caf50; }
+.quiz-feedback.incorrect { color: #f44336; }
+
+/* Footer with Next button */
+.sim-popup__footer {
+    padding: 10px 16px 12px;
+    flex-shrink: 0;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.sim-popup__next {
+    padding: 7px 18px;
+    border-radius: 6px;
+    background: var(--color-accent);
+    color: var(--color-bg);
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.sim-popup__next:hover { background: #00c49f; }
+
+/* Hidden state used by JS */
+.sim-popup--hidden { display: none !important; }
+
+/* ── End card (tour completion / quiz results) ───────────────────── */
+.end-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    padding: 4px 0 6px;
+}
+
+.end-card__icon {
+    font-size: 40px;
+    line-height: 1;
+}
+
+.end-card__heading {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.3;
+}
+
+.end-card__sub {
+    font-size: 13px;
+    color: var(--color-text-dim);
+    line-height: 1.6;
+    max-width: 280px;
+}
+
+/* Score pill */
+.end-card__score {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    border-radius: 999px;
+    border: 2px solid var(--color-accent);
+    margin: 4px 0;
+}
+
+.end-card__score-fraction {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--color-text);
+    letter-spacing: 0.02em;
+}
+
+.end-card__score-pct {
+    font-size: 13px;
+    color: var(--color-text-dim);
+    font-weight: 600;
+}
+
+/* Color the pill border/text by performance tier */
+.end-card__score.tier-high   { border-color: #4caf50; }
+.end-card__score.tier-mid    { border-color: #E6CC00; }
+.end-card__score.tier-low    { border-color: #f44336; }
+
+.end-card__score.tier-high .end-card__score-fraction { color: #4caf50; }
+.end-card__score.tier-mid  .end-card__score-fraction { color: #E6CC00; }
+.end-card__score.tier-low  .end-card__score-fraction { color: #f44336; }
+
+.end-card__phrase {
+    font-size: 13px;
+    font-style: italic;
+    color: var(--color-text-dim);
+    line-height: 1.5;
+    max-width: 280px;
 }

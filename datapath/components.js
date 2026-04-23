@@ -22,6 +22,7 @@ import { showPopup, hidePopup } from "../ui/popup.js";
 const COMPONENTS = {
     'pc' : {
         label: 'Program Counter (PC)',
+        canvasLabel: 'PC',
         shape: 'rect',
         category: 'register',
         x: 40, y: 700, width: 100, height: 200,
@@ -30,6 +31,7 @@ const COMPONENTS = {
 
     'instruction-mem' : {
         label: 'Instruction Memory',
+        canvasLabel: 'Instruction\nMemory',
         shape: 'rect',
         category: 'memory',
         x: 275, y: 600, width: 400, height: 400,
@@ -38,6 +40,7 @@ const COMPONENTS = {
 
     'mux-reg-dst' : {
         label: 'Multiplexer (MUX) - Register Destination',
+        canvasLabel: 'M\nU\nX',
         shape: 'mux',
         category: 'mux',
         x: 800, y: 780,
@@ -46,6 +49,7 @@ const COMPONENTS = {
 
     'reg-file' : {
         label: 'Register File',
+        canvasLabel: 'Register\nFile',
         shape: 'rect',
         category: 'register',
         x: 900, y: 600, width: 400, height: 400,
@@ -54,6 +58,7 @@ const COMPONENTS = {
 
     'sign-ext' : {
         label: 'Sign Extend',
+        canvasLabel: 'Sign\nExtend',
         shape: 'circle',
         category: 'logic',
         x: 1100, y: 1070,
@@ -62,6 +67,7 @@ const COMPONENTS = {
 
     'mux-alu-src' : {
         label: 'Multiplexer (MUX) - ALU Source',
+        canvasLabel: 'M\nU\nX',
         shape: 'mux',
         category: 'mux',
         x: 1400, y: 820,
@@ -70,6 +76,7 @@ const COMPONENTS = {
 
     'alu' : {
         label: 'Arithmetic Logic Unit (ALU)',
+        canvasLabel: 'A\nL\nU',
         shape: 'alu',
         category: 'alu',
         x: 1500, y: 675,
@@ -78,6 +85,7 @@ const COMPONENTS = {
 
     'alu-control' : {
         label: 'ALU Control',
+        canvasLabel: 'ALU\nControl',
         shape: 'circle',
         category: 'control',
         x: 1500, y: 1050,
@@ -86,6 +94,7 @@ const COMPONENTS = {
 
     'data-mem' : {
         label: 'Data Memory',
+        canvasLabel: 'Data\nMemory',
         shape: 'rect',
         category: 'memory',
         x: 1650, y: 600, width: 400, height: 400,
@@ -94,6 +103,7 @@ const COMPONENTS = {
 
     'mux-mem-to-reg' : {
         label: 'Multiplexer (MUX) - Memory to Register',
+        canvasLabel: 'M\nU\nX',
         shape: 'mux',
         category: 'mux',
         x: 2150, y: 750,
@@ -102,6 +112,7 @@ const COMPONENTS = {
 
     'control' : {
         label: 'Control',
+        canvasLabel: 'Control',
         shape: 'circle',
         category: 'control',
         x: 800, y: 250,
@@ -110,6 +121,7 @@ const COMPONENTS = {
 
     'adder-pc' : {
         label: 'Add',
+        canvasLabel: 'A\nD\nD',
         shape: 'alu',
         category: 'alu',
         x: 400, y: 100,
@@ -117,7 +129,8 @@ const COMPONENTS = {
     },
 
     'shift-left-2' : {
-        label: 'Shift Left 2',
+        label: 'Shift\nLeft 2',
+        canvasLabel: 'Shift',
         shape: 'circle',
         category: 'logic',
         x: 1400, y: 250,
@@ -126,6 +139,7 @@ const COMPONENTS = {
 
     'adder-branch' : {
         label: 'Add',
+        canvasLabel: 'A\nD\nD',
         shape: 'alu',
         category: 'alu',
         x: 1650, y: 80,
@@ -134,6 +148,7 @@ const COMPONENTS = {
 
     'mux-pc-src' : {
         label: 'Multiplexer (MUX) - PC Source',
+        canvasLabel: 'M\nU\nX',
         shape: 'mux',
         category: 'mux',
         x: 1850, y: 110,
@@ -234,7 +249,7 @@ function _attachInteraction(group, id) {
  * @param {number} fontSize
  * @returns {Konva.Text}
  */
-function _makeLabel(text, x, y, width, height, fontSize=14) {
+function _makeLabel(text, x, y, width, height, fontSize=34) {
     return new Konva.Text({
         x, y,
         width, height,
@@ -242,7 +257,7 @@ function _makeLabel(text, x, y, width, height, fontSize=14) {
         fontSize,
         fontFamily: 'monospace',
         fonstStyle: 'bold',
-        fill: 'black',
+        fill: 'white',
         align: 'center',
         verticalAlign: 'middle',
     });
@@ -259,13 +274,13 @@ function _addRect(group, def) {
     group.add(new Konva.Rect({
         width: def.width,
         height: def.height,
-        fill: 'gray',
+        fill: '#0d0f14',
         stroke: _strokeForCategory(def.category),
         strokeWidth: 2,
         cornerRadius: 10,
     }));
 
-    group.add(_makeLabel(def.label, 0, 0, def.width, def.height));
+    group.add(_makeLabel(def.canvasLabel, 0, 0, def.width, def.height));
 }
 
 /**
@@ -276,19 +291,19 @@ function _addRect(group, def) {
  * @param {object} def - component definition from COMPONENTS
  */
 function _addCircle(group, def) {
-    const radius = 40; // Fixed radius for all circle components
+    const radius = 60; // Fixed radius for all circle components
     const diameter = radius * 2;
 
     group.add(new Konva.Circle({
         x: radius,
         y: radius,
         radius: radius,
-        fill: 'gray',
+        fill: '#0d0f14',
         stroke: _strokeForCategory(def.category),
         strokeWidth: 2,
     }));
 
-    group.add(_makeLabel(def.label, 0, 0, diameter, diameter, 12));
+    group.add(_makeLabel(def.canvasLabel, 0, 0, diameter, diameter, 24));
 }
 
 /**
@@ -301,11 +316,11 @@ function _addALU(group, def) {
     group.add(new Konva.Line({
         points: [0, 0, 55, 70, 55, 180, 0, 250, 0, 150, 15, 125, 0, 100],
         closed: true,
-        fill: 'gray',
+        fill: '#0d0f14',
         stroke: _strokeForCategory(def.category),
         strokeWidth: 2,
     }));
-    group.add(_makeLabel(def.label, 5, 0, 45, 250, 11));
+    group.add(_makeLabel(def.canvasLabel, 10, 0, 45, 250, 30));
 
 }
 
@@ -324,12 +339,12 @@ function _addMUX(group, def) {
         width: width,
         height: height,
         cornerRadius: width / 2,
-        fill: 'gray',
+        fill: '#0d0f14',
         stroke: _strokeForCategory(def.category),
         strokeWidth: 2,
     }));
 
-    group.add(_makeLabel(def.label, 0, 0, width, height, 12));
+    group.add(_makeLabel(def.canvasLabel, 0, 0, width, height, 30));
 }
 
 
