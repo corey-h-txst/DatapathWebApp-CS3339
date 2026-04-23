@@ -4,58 +4,101 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Datapath Visualizer</title>
-    <!--Our stylesheet-->
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <!--Top navigation bar-->
     <header class="topbar">
         <span class="topbar__title">Datapath Visualizer</span>
         <nav class="topbar__nav">
-            <a href="#" class="active">Simulator</a>
-            <a href="#">Learn</a>
-            <a href="#">About</a>
+            <a href="#" id="nav-home" class="active">Home</a>
+            <a href="#" id="nav-sim">Simulator</a>
+            <a href="#" id="nav-learn">Learn</a>
+            <a href="#" id="nav-about">About</a>
         </nav>
     </header>
-    <!--Layout with sidebar on left and canvas on right-->
-    <div class="layout">
-        <!--Sidebar controls and component info go here-->
-        <aside class="sidebar">
-            <!--Panels added here-->
-            <section class="panel">
-                <h2 class="panel__heading">Mode</h2>
 
-                <div class="mode-toggle" id="mode-toggle-container">
-                    <div class="toggle-slider"></div> <button id="learn-toggle" class="toggle-btn active">Learn</button>
-                    <button id="quiz-toggle" class="toggle-btn">Quiz</button>
+    <div id="home-screen" class="active">
+        <div class="home-container">
+            <h1 class="home-title">Datapath Visualizer</h1>
+            <p class="home-subtitle">
+                Learn how CPU datapaths work through interactive simulation and guided exploration.
+            </p>
+            <div class="home-actions">
+                <button id="start-btn" class="primary-btn">Start Simulator</button>
+                <button id="learn-more-btn" class="secondary-btn">Learn More</button>
+            </div>
+            <div class="home-preview">
+                <div class="preview-box">
+                    Datapath Visualization Preview
                 </div>
-            </section>
-            <!-- Controls-->
-            <section class="panel" id="controls-panel">
-                <h2 class="panel__heading">Simulation Controls</h2>
-                <button id="run-btn">Run</button>
-                <button id="step-btn">Step</button>
-                <button id="reset-btn">Reset</button>
-            </section>
-            <section class="panel" id="instruction-types-panel">
-                <h2 class="panel__heading">SELECT INSTRUCTION</h2>
-
-                <div class="instruction-grid">
-                    <button id="none-btn"  class="square-btn none-color">None</button>
-                    <button id="alu-btn" class="square-btn alu-color">ALU</button>
-                    <button id="load-btn" class="square-btn load-color">Load</button>
-                    <button id="store-btn" class="square-btn store-color">Store</button>
-                    <button id="branch-btn" class="square-btn branch-color">Branch</button>
-                    <button id="jump-btn"  class="square-btn jump-color">Jump</button>
+            </div>
+            <div class="home-features">
+                <div class="feature">
+                    <h3>Interactive</h3>
+                    <p>Step through instructions and see signals flow in real time.</p>
                 </div>
+                <div class="feature">
+                    <h3>Learn Mode</h3>
+                    <p>Understand each component with guided explanations.</p>
+                </div>
+                <div class="feature">
+                    <h3>Quiz Mode</h3>
+                    <p>Test your knowledge with challenges.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            </section>
-        </aside>
-        <main class="canvas-wrapper">
+    <div id="simulator">
+        <div class="layout">
+            <aside class="sidebar">
+                <section class="panel">
+                    <h2 class="panel__heading">Mode</h2>
+                    <div class="mode-toggle" id="mode-toggle-container">
+                        <div class="toggle-slider"></div>
+                        <button id="learn-toggle" class="toggle-btn active">Learn</button>
+                        <button id="quiz-toggle" class="toggle-btn">Quiz</button>
+                    </div>
+                </section>
+                <section class="panel" id="controls-panel">
+                    <h2 class="panel__heading">Simulation Controls</h2>
+                    <button id="run-btn" class="control-btn">Run</button>
+                    <button id="step-btn" class="control-btn">Step</button>
+                    <button id="reset-btn" class="control-btn">Reset</button>
+                </section>
+                <section class="panel" id="instruction-types-panel">
+                    <h2 class="panel__heading">SELECT INSTRUCTION</h2>
+                    <div class="instruction-grid">
+                        <button id="none-btn" class="square-btn none-color">None</button>
+                        <button id="alu-btn" class="square-btn alu-color">ALU</button>
+                        <button id="load-btn" class="square-btn load-color">Load</button>
+                        <button id="store-btn" class="square-btn store-color">Store</button>
+                        <button id="branch-btn" class="square-btn branch-color">Branch</button>
+                        <button id="jump-btn" class="square-btn jump-color">Jump</button>
+                    </div>
+                </section>
+            </aside>
+            <main class="canvas-wrapper">
                 <div id="konva-container"></div>
             </main>
         </div>
-        <script src="https://unpkg.com/konva@9/konva.min.js"></script>
-        <script type="module" src="src/main.js"></script>
-    </body>
-    </html>
+    </div>
+
+    <div id="learn-page">
+        <div class="content-page">
+            <h1>Learn</h1>
+            <p>Explain datapath concepts here.</p>
+        </div>
+    </div>
+
+    <div id="about-page">
+        <div class="content-page">
+            <h1>About</h1>
+            <p>Info about your project and team goes here.</p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/konva@9/konva.min.js"></script>
+    <script type="module" src="pages/router.js"></script>
+</body>
+</html>

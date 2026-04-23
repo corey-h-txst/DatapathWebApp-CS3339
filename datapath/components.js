@@ -167,7 +167,7 @@ export function initComponents() {
         layer.add(group);
     }
 
-    layer.draw();
+    layer.batchDraw();
     _setupGlobalDismiss();
 }
 
@@ -256,11 +256,15 @@ function _makeLabel(text, x, y, width, height, fontSize=34) {
         text,
         fontSize,
         fontFamily: 'monospace',
-        fonstStyle: 'bold',
+        fontStyle: 'bold',
         fill: 'white',
         align: 'center',
-        verticalAlign: 'middle',
     });
+    label.position({
+        x: x + (width - label.width()) / 2,
+        y: y + (height - label.height()) / 2,
+    });
+    return label;
 }
 
 /**
