@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <!-- Top navigation bar -->
     <header class="topbar">
         <span class="topbar__title">Datapath Visualizer</span>
         <nav class="topbar__nav">
@@ -17,7 +16,7 @@
             <a href="#" id="nav-about">About</a>
         </nav>
     </header>
-    <!-- HOME -->
+
     <div id="home-screen" class="active">
         <div class="home-container">
             <h1 class="home-title">Datapath Visualizer</h1>
@@ -49,22 +48,23 @@
             </div>
         </div>
     </div>
-    <!-- SIMULATOR -->
+
     <div id="simulator">
         <div class="layout">
             <aside class="sidebar">
                 <section class="panel">
                     <h2 class="panel__heading">Mode</h2>
                     <div class="mode-toggle" id="mode-toggle-container">
-                        <div class="toggle-slider"></div> <button id="learn-toggle" class="toggle-btn active">Learn</button>
+                        <div class="toggle-slider"></div>
+                        <button id="learn-toggle" class="toggle-btn active">Learn</button>
                         <button id="quiz-toggle" class="toggle-btn">Quiz</button>
                     </div>
                 </section>
                 <section class="panel" id="controls-panel">
                     <h2 class="panel__heading">Simulation Controls</h2>
-                    <button class="control-btn" id="run-btn">Run</button>
-                    <button class="control-btn" id="step-btn">Step</button>
-                    <button class="control-btn" id="reset-btn">Reset</button>
+                    <button id="run-btn" class="control-btn">Run</button>
+                    <button id="step-btn" class="control-btn">Step</button>
+                    <button id="reset-btn" class="control-btn">Reset</button>
                 </section>
                 <section class="panel" id="instruction-types-panel">
                     <h2 class="panel__heading">SELECT INSTRUCTION</h2>
@@ -83,18 +83,22 @@
             </main>
         </div>
     </div>
-    <!-- LEARN -->
+
     <div id="learn-page">
-        <h1>Learn</h1>
-        <p>Explain datapath concepts here.</p>
+        <div class="content-page">
+            <h1>Learn</h1>
+            <p>Explain datapath concepts here.</p>
+        </div>
     </div>
-    <!-- ABOUT -->
+
     <div id="about-page">
-        <h1>About</h1>
-        <p>Info about your project/team.</p>
+        <div class="content-page">
+            <h1>About</h1>
+            <p>Info about your project and team goes here.</p>
+        </div>
     </div>
+
     <script src="https://unpkg.com/konva@9/konva.min.js"></script>
-    <script type="module" src="ui/panels.js"></script>
     <script type="module" src="pages/router.js"></script>
 </body>
 </html>

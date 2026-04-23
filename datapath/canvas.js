@@ -4,7 +4,6 @@
  * Initializes and manages Konva.js stage for Datapath Visualizer
  */
 
-
 // Konva instances
 let stage = null;
 let mainLayer = null;
@@ -13,8 +12,14 @@ let animationLayer = null;
 // Canvas configurations
 const CANVAS_WIDTH = 2300;
 const CANVAS_HEIGHT = 1250;
-let MIN_SCALE = 0.8;
-const MAX_SCALE = 3;
+
+// Separate fit scale from user zoom limit
+let FIT_SCALE = 1;
+let MIN_SCALE = 0.4;
+const MAX_SCALE = 2;
+
+// controls how far user can zoom out past fit
+const USER_MIN_SCALE_MULT = 0.75;
 
 /**
  * Creates Konva stage, layers, and all camera controls.
@@ -41,14 +46,16 @@ export function initCanvas(containerId) {
     stage.add(animationLayer);
 
     // Compute minimum scale that fits full datapath in viewport
-    MIN_SCALE = Math.min(
+    FIT_SCALE = Math.min(
         container.clientWidth / CANVAS_WIDTH,
         container.clientHeight / CANVAS_HEIGHT
     );
 
+    MIN_SCALE = FIT_SCALE * USER_MIN_SCALE_MULT;
+
     // Start fully zoomed upon loading page
-    stage.scale({x: MIN_SCALE, y: MIN_SCALE});
-    stage.position(_clampPosition({x: 0, y: 0}, MIN_SCALE));
+    stage.scale({x: FIT_SCALE, y: FIT_SCALE});
+    stage.position(_clampPosition({x: 0, y: 0}, FIT_SCALE));
 
     _setupZoom();
     _setupPanClamping();
@@ -78,6 +85,7 @@ function _setupZoom() {
 
         const direction = e.evt.deltaY < 0 ? 1 : -1;
         const rawScale = oldScale * (direction > 0 ? SCALE_FACTOR : 1 / SCALE_FACTOR);
+
         const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, rawScale));
 
         stage.scale({ x: newScale, y: newScale });
@@ -94,8 +102,6 @@ function _setupZoom() {
 
 /**
  * Prevents user from panning outside of the canvas content area.
- * 
- * Fires on all drag events and immediately corrects stage position.
  */ 
 function _setupPanClamping() {
     stage.on('dragmove', () => {
@@ -106,17 +112,6 @@ function _setupPanClamping() {
 /**
  * Computes valid stage position that keeps the currently scaled
  * canvas within the viewport.
- * 
- * If scaled content is small (at MIN_SCALE) then content is locked
- * and centered with no panning allowed.
- * 
- * When scaled content is larger than view port (zoomed in) then panning
- * is allowed up to the point where either edge of the content reaches
- * their corresponding edge of the view port.
- * 
- * @param {{x: number, y: number}} pos - input stage position
- * @param {number} scale - current scale
- * @returns  {{x: number, y: number}} - clamped stage position
  */
 function _clampPosition(pos, scale) {
     const viewWidth = stage.width();
@@ -128,23 +123,19 @@ function _clampPosition(pos, scale) {
     let minX, maxX, minY, maxY;
 
     if (scaledWidth <= viewWidth) {
-        // Content fits horizontally - lock it centered
         const cx = (viewWidth - scaledWidth) / 2;
         minX = cx;
         maxX = cx;
     } else {
-        // Content overflows - allow panning between left & right edges
         minX = viewWidth - scaledWidth;
         maxX = 0;
     }
 
     if (scaledHeight <= viewHeight) {
-        // Content fits vertically - lock it centered
         const cy = (viewHeight - scaledHeight) / 2;
         minY = cy;
         maxY = cy;
     } else {
-        // Content overflows - allow panning between top & bottom edges
         minY = viewHeight - scaledHeight;
         maxY = 0;
     }
@@ -157,25 +148,50 @@ function _clampPosition(pos, scale) {
 
 /**
  * Keeps stage sized to its container when the browser window is resized.
- * 
- * Also recomputes MIN_SCALE so the full datapath still fits at max zoom-out,
- * and reclamps theposition in case the smaller viewport clips content.
- * 
- * @param {HTMLElement} container 
  */
 function _setupResizeObserver(container) {
     const ro = new ResizeObserver(() => {
         stage.width(container.clientWidth);
         stage.height(container.clientHeight);
 
-        MIN_SCALE = Math.min(
-            container.clientHeight / CANVAS_HEIGHT,
-            container.clientWidth / CANVAS_WIDTH
+        FIT_SCALE = Math.min(
+            container.clientWidth / CANVAS_WIDTH,
+            container.clientHeight / CANVAS_HEIGHT
         );
+
+        MIN_SCALE = FIT_SCALE * USER_MIN_SCALE_MULT;
 
         stage.position(_clampPosition(stage.position(), stage.scaleX()));
     });
     ro.observe(container);
+}
+
+/**
+ * Smoothly pans and zooms the stage to frame a component.
+ * 
+ * @param {string} componentId
+ * @param {number} [targetScale=1.4] - zoom level to land on
+ * @param {number} [durationMs=600]
+ */
+export function panToPoint(cx, cy, targetScale = 1.4, durationMs = 600) {
+    const clampedScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, targetScale));
+
+    const targetPos = _clampPosition({
+        x: stage.width()  / 2 - cx * clampedScale,
+        y: stage.height() / 2 - cy * clampedScale,
+    }, clampedScale);
+
+    const tween = new Konva.Tween({
+        node: stage,
+        duration: durationMs / 1000,
+        easing: Konva.Easings.EaseInOut,
+        x: targetPos.x,
+        y: targetPos.y,
+        scaleX: clampedScale,
+        scaleY: clampedScale,
+    });
+
+    tween.play();
 }
 
 // Returns Konva stage instance
