@@ -1,10 +1,20 @@
-const runBtn = document.getElementById("run-btn");
-const stepBtn = document.getElementById("step-btn");
-const resetBtn = document.getElementById("reset-btn");
-const controls = [runBtn, stepBtn, resetBtn];
-controls.forEach(btn => {
-    btn.addEventListener("click", () => {
-        controls.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
+let controlsInitialized = false;
+
+export function initSimulatorControls() {
+    if (controlsInitialized) return;
+
+    const controls = [
+        document.getElementById("run-btn"),
+        document.getElementById("step-btn"),
+        document.getElementById("reset-btn"),
+    ].filter(Boolean);
+
+    controls.forEach((button) => {
+        button.addEventListener("click", () => {
+            controls.forEach((control) => control.classList.remove("active"));
+            button.classList.add("active");
+        });
     });
-});
+
+    controlsInitialized = true;
+}
