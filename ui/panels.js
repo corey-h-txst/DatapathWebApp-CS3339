@@ -11,6 +11,7 @@ import { setMode, getMode, startSimulation, resetSimulation, advance, getCurrent
 import { startTour, renderTourStep } from './tour.js';
 import { startQuiz, renderQuizStep } from './quiz.js';
 import { hideSimPopup, setComponentPopupsEnabled } from './popup.js';
+import { resetWires } from '../datapath/wires.js';
 import { aluInstruction } from '../instructions/alu.js';
 import { loadInstruction }   from '../instructions/load.js';
 import { storeInstruction }  from '../instructions/store.js';
@@ -87,6 +88,7 @@ export function initPanels() {
     function finishSimulation() {
         hideSimPopup();
         setComponentPopupsEnabled(true);
+        resetWires();
         setRunning(false);  // resets run button UI
     }
 
@@ -160,6 +162,7 @@ export function initPanels() {
         resetSimulation();
         hideSimPopup();
         setComponentPopupsEnabled(true);
+        resetWires();
         setRunning(false);
     });
 }

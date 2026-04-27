@@ -9,6 +9,7 @@
 import { getCurrentStep, advance, isFinished } from '../src/state.js';
 import { panToPoint } from '../datapath/canvas.js';
 import { getComponent } from '../datapath/components.js';
+import { applyWireStep } from '../datapath/wires.js';
 import { showTourPopup, showTourEndPopup} from './popup.js';
 
 // Saved at startTour()/startQuiz() so _onNext can read it directly.
@@ -34,6 +35,8 @@ export function startTour(onFinish) {
  */
 export function renderTourStep(step) {
     if (!step) return;
+
+    applyWireStep(step);
 
     // Pan the canvas to center on this step's component
     const def = getComponent(step.componentId);

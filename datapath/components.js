@@ -43,7 +43,7 @@ const COMPONENTS = {
         canvasLabel: 'M\nU\nX',
         shape: 'mux',
         category: 'mux',
-        x: 800, y: 780,
+        x: 840, y: 780,
         info: 'placeholder',
     },
 
@@ -61,7 +61,7 @@ const COMPONENTS = {
         canvasLabel: 'Sign\nExtend',
         shape: 'circle',
         category: 'logic',
-        x: 1100, y: 1070,
+        x: 1100, y: 1100,
         info: 'placeholder',
     },
 
@@ -70,7 +70,7 @@ const COMPONENTS = {
         canvasLabel: 'M\nU\nX',
         shape: 'mux',
         category: 'mux',
-        x: 1400, y: 820,
+        x: 1420, y: 820,
         info: 'placeholder',
     },
 
@@ -88,7 +88,7 @@ const COMPONENTS = {
         canvasLabel: 'ALU\nControl',
         shape: 'circle',
         category: 'control',
-        x: 1500, y: 1050,
+        x: 1440, y: 1150,
         info: 'placeholder',
     },
 
@@ -115,7 +115,7 @@ const COMPONENTS = {
         canvasLabel: 'Control',
         shape: 'circle',
         category: 'control',
-        x: 800, y: 250,
+        x: 800, y: 280,
         info: 'placeholder',
     },
 
@@ -249,17 +249,22 @@ function _attachInteraction(group, id) {
  * @param {number} fontSize
  * @returns {Konva.Text}
  */
-function _makeLabel(text, x, y, width, height, fontSize=34) {
+function _makeLabel(text, x, y, width, height, fontSize = 34) {
+    const lineCount = String(text).split('\n').length;
+    const lineHeight = 1;
+    const textHeight = lineCount * fontSize * lineHeight;
+
     return new Konva.Text({
-        x, y,
-        width, height,
+        x,
+        y: y + (height - textHeight) / 2,
+        width,
         text,
         fontSize,
         fontFamily: 'monospace',
         fontStyle: 'bold',
         fill: 'white',
         align: 'center',
-        verticalAlign: 'middle',
+        lineHeight,
     });
 }
 
