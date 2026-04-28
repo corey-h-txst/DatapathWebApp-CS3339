@@ -2,26 +2,35 @@
  * quiz.js
  *
  * UI handler for quiz-mode.
- * Goes through instruction steps rendering each sim popup
- * while letting popup.js handle display logic
+ * Iterates through instruction steps, rendering each quiz question in the sim popup
+ * while letting popup.js handle display logic.
+ *
+ * The quiz flow:
+ *   1. startQuiz() renders the first question
+ *   2. User selects an answer → score is recorded, correct answer is revealed
+ *   3. User clicks Next → _onNext() advances or shows the scored end card
+ *   4. End card's Done button calls the onFinish callback (from panels.js)
  */
 
-import { getCurrentStep, advance, isFinished, getQuizScore, recordAnswer } from '../src/state.js';
-import { panToPoint } from '../datapath/canvas.js';
-import { getComponent } from '../datapath/components.js';
+import { getCurrentStep, getNextStep, advance, isFinished, getQuizScore, recordAnswer } from '../src/state.js';
 import { applyWireStep } from '../datapath/wires.js';
-import { showQuizPopup, showQuizEndPopup} from './popup.js';
+import { showQuizPopup, showQuizEndPopup } from './popup.js';
+import { animateStepCamera } from './step-camera.js';
 
-// Saved at startTour()/startQuiz() so _onNext can read it directly.
-// Without this, onFinish would have to be passed as a parameter through
-// _renderCurrentStep → renderTourStep → showTourPopup just to reach _onNext.
+/**
+ * Saved at startQuiz() so _onNext can read it directly.
+ * Without this, onFinish would have to be passed as a parameter through
+ * _renderCurrentStep → renderQuizStep → showQuizPopup just to reach _onNext.
+ *
+ * @type {(() => void)|null}
+ */
 let _onFinish = null;
 
 /**
- * Starts the quiz for the currently loaded instruction
- * Renders the first question immediately
+ * Starts the quiz for the currently loaded instruction.
+ * Renders the first question immediately.
  *
- * @param {() => void} onFinish - called when the user dismisses the end card
+ * @param {() => void} onFinish - Called when the user dismisses the end card
  */
 export function startQuiz(onFinish) {
     _onFinish = onFinish;
@@ -30,6 +39,8 @@ export function startQuiz(onFinish) {
 
 /**
  * Renders a specific quiz step into the sim popup.
+ * Applies wire states, animates the camera, and shows the quiz popup.
+ * recordAnswer is passed as onAnswer so popup.js can score each choice click.
  *
  * @param {{ componentId: string, quiz: { question: string, body: string[], answer: number } }} step
  */
@@ -37,32 +48,24 @@ export function renderQuizStep(step) {
     if (!step) return;
 
     applyWireStep(step);
-
-    // Pan the canvas to center on this step's component
-    const def = getComponent(step.componentId);
-    if (def) {
-        const cx = def.x + (def.width  ?? 80) / 2;
-        const cy = def.y + (def.height ?? 80) / 2;
-        panToPoint(cx, cy);
-    }
-    // recordAnswer is passed as onAnswer so popup.js can score each choice click
+    animateStepCamera(step, getNextStep());
     showQuizPopup(step.quiz, _onNext, recordAnswer);
 }
 
 /**
- * Handles the Next button click inside the quiz popup
- * Shows the scored end card on the last step, otherwise advances and re-renders
+ * Handles the Next button click inside the quiz popup.
+ * Shows the scored end card on the last step, otherwise advances and re-renders.
  */
 function _onNext() {
     if (isFinished()) {
-        showQuizEndPopup(getQuizScore(), _onFinish)
+        showQuizEndPopup(getQuizScore(), _onFinish);
         return;
     }
     advance();
     _renderCurrentStep();
 }
 
-/** Reads current step from state and renders it */
+/** Reads the current step from state and renders it. */
 function _renderCurrentStep() {
     const step = getCurrentStep();
     if (!step) return;

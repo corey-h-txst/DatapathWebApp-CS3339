@@ -1,24 +1,52 @@
 /**
  * components.js
- * 
- * Defines, draws, and manages all datapath components on the Konva.js canvas
+ *
+ * Defines, draws, and manages all datapath components on the Konva.js canvas.
+ * Each component is registered in the COMPONENTS registry with its position,
+ * shape type, category, and display labels. The initComponents() function
+ * iterates the registry and builds Konva groups for each one.
+ *
+ * Shape types:
+ *   - 'rect'   : Rectangle (PC, Instruction Memory, Register File, Data Memory)
+ *   - 'circle' : Circle (Control, Sign Extend, Shift Left 2, ALU Control)
+ *   - 'alu'    : Chevron shape (main ALU, Adders)
+ *   - 'mux'    : Pill-shaped rounded rect (all multiplexers)
  */
 
 import { getMainLayer, getStage } from "./canvas.js";
 import { showPopup, hidePopup } from "../ui/popup.js";
 
+// ── Shape dimension constants ────────────────────────────────────────────────
+
+const CIRCLE_RADIUS = 60;
+const CIRCLE_DIAMETER = CIRCLE_RADIUS * 2;
+const ALU_WIDTH = 55;
+const ALU_HEIGHT = 250;
+const MUX_WIDTH = 40;
+const MUX_HEIGHT = 140;
+
+// ── Component Registry ───────────────────────────────────────────────────────
+
 /**
- * Component Registry
- * 
- * Fields:
- *  label {string} - display name on popup
- *  shape {string} - drawing style: 'rect' | 'circle' | 'mux' | 'alu'
- *  category {string} - type of component, determines stroke (outline) color
- *  x, y {number} - coordinate position on canvas
- *  width, height - {number} - used by 'rect' shape only
- *  info {string} - description shown in the popup body
+ * @typedef {Object} ComponentDef
+ * @property {string}  label       - Display name shown in the popup title
+ * @property {string}  canvasLabel - Short label drawn on the canvas shape (supports '\n')
+ * @property {string}  shape       - Drawing style: 'rect' | 'circle' | 'mux' | 'alu'
+ * @property {string}  category    - Component category, determines stroke color
+ * @property {number}  x           - X position on the canvas
+ * @property {number}  y           - Y position on the canvas
+ * @property {number}  [width]     - Width (required for 'rect' shape)
+ * @property {number}  [height]    - Height (required for 'rect' shape)
+ * @property {string}  info        - Description shown in the popup body
  */
 
+/**
+ * Registry of all datapath components.
+ * Each key is a unique component id used to reference the component
+ * from instruction steps, wire definitions, and camera animations.
+ *
+ * @type {Object<string, ComponentDef>}
+ */
 const COMPONENTS = {
     'pc' : {
         label: 'Program Counter (PC)',
@@ -156,8 +184,11 @@ const COMPONENTS = {
     },
 };
 
+// ── Initialization ───────────────────────────────────────────────────────────
+
 /**
- * Draws all components onto main Konva layer and wires interactions.
+ * Draws all components onto the main Konva layer and wires up
+ * hover/click interactions. Must be called once after initCanvas().
  */
 export function initComponents() {
     const layer = getMainLayer();
@@ -171,21 +202,71 @@ export function initComponents() {
     _setupGlobalDismiss();
 }
 
+// ── Registry accessors ───────────────────────────────────────────────────────
+
 /**
  * Returns the registry definition for a component by its id.
- * 
- * @param {string} id 
- * @returns {object|null}
+ *
+ * @param {string} id - Component id (e.g. 'pc', 'alu', 'control')
+ * @returns {ComponentDef|null}
  */
 export function getComponent(id) {
     return COMPONENTS[id] ?? null;
 }
 
 /**
- * Returns all components belonging to a given category.
- * 
- * @param {string} category 
- * @returns {string[]} - array of matching component ids
+ * Returns the drawing bounds for a component on the canvas.
+ * Bounds vary by shape type (rect uses def.width/height, circle uses CIRCLE_DIAMETER, etc.).
+ *
+ * @param {string} id - Component id
+ * @returns {{ x: number, y: number, width: number, height: number } | null}
+ */
+export function getComponentBounds(id) {
+    const def = getComponent(id);
+    if (!def) return null;
+
+    switch (def.shape) {
+        case 'rect':
+            return { x: def.x, y: def.y, width: def.width, height: def.height };
+        case 'circle':
+            return { x: def.x, y: def.y, width: CIRCLE_DIAMETER, height: CIRCLE_DIAMETER };
+        case 'alu':
+            return { x: def.x, y: def.y, width: ALU_WIDTH, height: ALU_HEIGHT };
+        case 'mux':
+            return { x: def.x, y: def.y, width: MUX_WIDTH, height: MUX_HEIGHT };
+        default:
+            return {
+                x: def.x,
+                y: def.y,
+                width: def.width ?? 80,
+                height: def.height ?? 80,
+            };
+    }
+}
+
+/**
+ * Returns the visual center point for a component.
+ * Used by the camera system to center the view on a component.
+ *
+ * @param {string} id - Component id
+ * @returns {{ x: number, y: number } | null}
+ */
+export function getComponentCenter(id) {
+    const bounds = getComponentBounds(id);
+    if (!bounds) return null;
+
+    return {
+        x: bounds.x + bounds.width / 2,
+        y: bounds.y + bounds.height / 2,
+    };
+}
+
+/**
+ * Returns all component ids that belong to a given category.
+ * Useful for querying groups of related components (e.g. all 'control' components).
+ *
+ * @param {string} category - Category name (e.g. 'control', 'memory', 'alu', 'register', 'mux', 'logic')
+ * @returns {string[]} - Array of matching component ids
  */
 export function getComponentsByCategory(category) {
     return Object.entries(COMPONENTS)
@@ -193,22 +274,25 @@ export function getComponentsByCategory(category) {
         .map(([id]) => id);
 }
 
+// ── Group building ───────────────────────────────────────────────────────────
+
 /**
- * Builds a Konva.Group for a single component, adds correct shape and label,
- * then attaches hover and click interactions
- * 
- * @param {string} id - registry key
- * @param {object} def - component definition from COMPONENTS
- * @returns 
+ * Builds a Konva.Group for a single component, adds the correct shape
+ * and label, then attaches hover and click interactions.
+ *
+ * @param {string} id  - Registry key (used as the Konva group id)
+ * @param {ComponentDef} def - Component definition from COMPONENTS
+ * @returns {Konva.Group}
  */
 function _buildGroup(id, def) {
-    const group = new Konva.Group({id, x: def.x, y: def.y});
+    const group = new Konva.Group({ id, x: def.x, y: def.y });
 
+    // Add the appropriate shape based on the component's shape type
     switch (def.shape) {
-        case 'rect': _addRect(group, def); break;
+        case 'rect':   _addRect(group, def);   break;
         case 'circle': _addCircle(group, def); break;
-        case 'alu': _addALU(group, def); break;
-        case 'mux': _addMUX(group, def); break;
+        case 'alu':    _addALU(group, def);    break;
+        case 'mux':    _addMUX(group, def);    break;
     }
 
     _attachInteraction(group, id);
@@ -216,11 +300,14 @@ function _buildGroup(id, def) {
     return group;
 }
 
+// ── Interaction handlers ─────────────────────────────────────────────────────
+
 /**
- * Attaches mouseenter, mouseleave, and click/tap handler to a component group
- * 
- * @param {Konva.Group} group 
- * @param {string} id 
+ * Attaches mouseenter, mouseleave, and click/tap handlers to a component group.
+ * Clicking a component shows the info popup via popup.js.
+ *
+ * @param {Konva.Group} group - The component's Konva group
+ * @param {string} id         - Component id (for debugging)
  */
 function _attachInteraction(group, id) {
     group.on('mouseenter', () => {
@@ -237,16 +324,19 @@ function _attachInteraction(group, id) {
     });
 }
 
+// ── Label helper ─────────────────────────────────────────────────────────────
+
 /**
- * Creates a center Konva.Text node for use inside a component shape (component label).
- * All shape builder route through this function for consistency.
+ * Creates a centered Konva.Text node for use inside a component shape.
+ * All shape builders route through this function for consistent styling.
+ * Supports multi-line text via '\n' in the text string.
  *
- * @param {string} text
- * @param {number} x 
- * @param {number} y 
- * @param {number} width
- * @param {number} height
- * @param {number} fontSize
+ * @param {string} text     - Label text (may contain '\n' for line breaks)
+ * @param {number} x        - X position of the text bounding box
+ * @param {number} y        - Y position of the text bounding box
+ * @param {number} width    - Width of the text bounding box
+ * @param {number} height   - Height of the text bounding box
+ * @param {number} fontSize - Font size in pixels
  * @returns {Konva.Text}
  */
 function _makeLabel(text, x, y, width, height, fontSize = 34) {
@@ -268,12 +358,14 @@ function _makeLabel(text, x, y, width, height, fontSize = 34) {
     });
 }
 
+// ── Shape builders ───────────────────────────────────────────────────────────
+
 /**
- * Rectangular Component - used for PC, Instruction Memory,
- * Register File, and Data Memory
- * 
- * @param {Konva.Group} group - group to add shapes into
- * @param {object} def - component definition from COMPONENTS
+ * Rectangular Component — used for PC, Instruction Memory,
+ * Register File, and Data Memory.
+ *
+ * @param {Konva.Group} group - Group to add shapes into
+ * @param {ComponentDef} def  - Component definition
  */
 function _addRect(group, def) {
     group.add(new Konva.Rect({
@@ -289,74 +381,72 @@ function _addRect(group, def) {
 }
 
 /**
- * Circular Component - used for Control, Sign Extend,
- * Shift Left 2, and ALU Control
- * 
- * @param {Konva.Group} group - group to add shapes into
- * @param {object} def - component definition from COMPONENTS
+ * Circular Component — used for Control, Sign Extend,
+ * Shift Left 2, and ALU Control.
+ *
+ * @param {Konva.Group} group - Group to add shapes into
+ * @param {ComponentDef} def  - Component definition
  */
 function _addCircle(group, def) {
-    const radius = 60; // Fixed radius for all circle components
-    const diameter = radius * 2;
-
     group.add(new Konva.Circle({
-        x: radius,
-        y: radius,
-        radius: radius,
+        x: CIRCLE_RADIUS,
+        y: CIRCLE_RADIUS,
+        radius: CIRCLE_RADIUS,
         fill: '#0d0f14',
         stroke: _strokeForCategory(def.category),
         strokeWidth: 2,
     }));
 
-    group.add(_makeLabel(def.canvasLabel, 0, 0, diameter, diameter, 24));
+    group.add(_makeLabel(def.canvasLabel, 0, 0, CIRCLE_DIAMETER, CIRCLE_DIAMETER, 24));
 }
 
 /**
- * ALU Chevron Component - used for main ALU and Adders
- * 
- * @param {Konva.Group} group - group to add shapes into
- * @param {object} def - component definition from COMPONENTS
+ * ALU Chevron Component — used for the main ALU and Adders.
+ * Draws a custom polygon shape resembling an ALU symbol.
+ *
+ * @param {Konva.Group} group - Group to add shapes into
+ * @param {ComponentDef} def  - Component definition
  */
 function _addALU(group, def) {
     group.add(new Konva.Line({
-        points: [0, 0, 55, 70, 55, 180, 0, 250, 0, 150, 15, 125, 0, 100],
+        points: [0, 0, ALU_WIDTH, 70, ALU_WIDTH, 180, 0, ALU_HEIGHT, 0, 150, 15, 125, 0, 100],
         closed: true,
         fill: '#0d0f14',
         stroke: _strokeForCategory(def.category),
         strokeWidth: 2,
     }));
-    group.add(_makeLabel(def.canvasLabel, 10, 0, 45, 250, 30));
-
+    group.add(_makeLabel(def.canvasLabel, 10, 0, ALU_WIDTH - 10, ALU_HEIGHT, 30));
 }
 
 /**
- * MUX Pilled-Shaped Container - used for all multiplexers
- * 
- * @param {Konva.Group} group - group to add shapes into
- * @param {object} def - component definition from COMPONENTS
+ * MUX Pill-Shaped Container — used for all multiplexers.
+ * Draws a rounded rectangle with corner radius equal to half the width,
+ * creating a pill/capsule shape.
+ *
+ * @param {Konva.Group} group - Group to add shapes into
+ * @param {ComponentDef} def  - Component definition
  */
 function _addMUX(group, def) {
-    const height = 140;
-    const width = 40;
-
     group.add(new Konva.Rect({
         x: 0, y: 0,
-        width: width,
-        height: height,
-        cornerRadius: width / 2,
+        width: MUX_WIDTH,
+        height: MUX_HEIGHT,
+        cornerRadius: MUX_WIDTH / 2,
         fill: '#0d0f14',
         stroke: _strokeForCategory(def.category),
         strokeWidth: 2,
     }));
 
-    group.add(_makeLabel(def.canvasLabel, 0, 0, width, height, 30));
+    group.add(_makeLabel(def.canvasLabel, 0, 0, MUX_WIDTH, MUX_HEIGHT, 30));
 }
 
+// ── Color mapping ────────────────────────────────────────────────────────────
 
 /**
- * Maps a components category to its corresponding stroke color.
- * 
- * @param {string} category 
+ * Maps a component's category to its corresponding stroke (outline) color.
+ * Each category has a distinct color for visual differentiation on the canvas.
+ *
+ * @param {string} category - Component category
  * @returns {string} - CSS color string
  */
 function _strokeForCategory(category) {
@@ -371,8 +461,11 @@ function _strokeForCategory(category) {
     return colors[category] ?? 'black';
 }
 
+// ── Global dismiss ───────────────────────────────────────────────────────────
+
 /**
- * Clicking anywhere outside a component dismisses the popup
+ * Clicking anywhere outside a component on the stage dismisses the popup.
+ * This is attached to the stage's click/tap event with a single handler.
  */
 function _setupGlobalDismiss() {
     getStage().on('click tap', (e) => hidePopup());

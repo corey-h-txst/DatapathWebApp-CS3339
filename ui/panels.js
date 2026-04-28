@@ -1,17 +1,23 @@
 /**
- * panel.js
- * 
- * Manages all sidebar UI interactions for the Datapath Visualizer
+ * panels.js
+ *
+ * Manages all sidebar UI interactions for the Datapath Visualizer.
  * Owns the run button state machine and wires instruction selection,
  * mode toggling, simulation start/step/reset, and the finish callback
  * passed down to tour.js and quiz.js.
+ *
+ * The sidebar contains:
+ *   - Instruction selection buttons (ALU, Load, Store, Branch, Jump, None)
+ *   - Mode toggle (Learn / Quiz)
+ *   - Run, Step, and Reset buttons
  */
 
 import { setMode, getMode, startSimulation, resetSimulation, advance, getCurrentStep } from '../src/state.js';
 import { startTour, renderTourStep } from './tour.js';
 import { startQuiz, renderQuizStep } from './quiz.js';
 import { hideSimPopup, setComponentPopupsEnabled } from './popup.js';
-import { resetWires } from '../datapath/wires.js';
+import { resetWires, clearAccumulatedWires } from '../datapath/wires.js';
+
 import { aluInstruction } from '../instructions/alu.js';
 import { loadInstruction }   from '../instructions/load.js';
 import { storeInstruction }  from '../instructions/store.js';
@@ -20,11 +26,11 @@ import { jumpInstruction }   from '../instructions/jump.js';
 
 /**
  * Wires all sidebar button interactions.
- * Must be called after the DOM has been parsed.
+ * Must be called after the DOM has been parsed and all subsystems initialized.
  */
 export function initPanels() {
 
-    // Element references
+    // ── Element references ───────────────────────────────────────────────────
     const instructionButtons = document.querySelectorAll('.square-btn');
     const noneBtn            = document.getElementById('none-btn');
     const learnToggle        = document.getElementById('learn-toggle');
@@ -34,6 +40,7 @@ export function initPanels() {
     const resetBtn           = document.getElementById('reset-btn');
     const stepBtn            = document.getElementById('step-btn');
 
+    // Maps button ids to their corresponding instruction data objects
     const instructionMap = {
         'alu-btn':    aluInstruction,
         'load-btn':   loadInstruction,
@@ -43,13 +50,15 @@ export function initPanels() {
         'none-btn':   null,
     };
 
-    // Tracks which instruction is currently selected
+    /** @type {object|null} - Currently selected instruction object */
     let selectedInstruction = null;
+
+    // ── Button activation ────────────────────────────────────────────────────
 
     /**
      * Marks one instruction button as active and dims all others.
      *
-     * @param {HTMLElement} activeBtn
+     * @param {HTMLElement} activeBtn - The button to activate
      */
     function activateButton(activeBtn) {
         instructionButtons.forEach(btn => {
@@ -64,10 +73,12 @@ export function initPanels() {
         });
     }
 
+    // ── Run button state ─────────────────────────────────────────────────────
+
     /**
-     * Handles behavior for run button and updates sim state to running
+     * Updates the run button's visual state and disabled property.
      *
-     * @param {bool} isRunning
+     * @param {boolean} isRunning - Whether a simulation is currently active
      */
     function setRunning(isRunning) {
         if (isRunning) {
@@ -81,33 +92,39 @@ export function initPanels() {
         }
     }
 
+    // ── Simulation finish handler ────────────────────────────────────────────
+
     /**
-     * Called when the tour or quiz end card's Done button
-     * is clicked and hides sim popup
+     * Called when the tour or quiz end card's Done button is clicked.
+     * Hides the sim popup, re-enables component popups, clears wire states,
+     * and resets the run button UI.
      */
     function finishSimulation() {
         hideSimPopup();
         setComponentPopupsEnabled(true);
+        clearAccumulatedWires();
         resetWires();
-        setRunning(false);  // resets run button UI
+        setRunning(false);
     }
+
+    // ── Event wiring ─────────────────────────────────────────────────────────
 
     // None selected by default
     activateButton(noneBtn);
 
-    // Instruction button clicks
+    // Instruction button clicks — select an instruction for simulation
     instructionButtons.forEach(button => {
         button.addEventListener('click', () => {
-            // Ignore clicks while simulation is running
-            if (runBtn.disabled) return;
+            if (runBtn.disabled) return; // Ignore clicks while simulation is running
             activateButton(button);
             selectedInstruction = instructionMap[button.id] ?? null;
         });
-    })
+    });
 
-    // Starts simulation
+    // Run button — starts the simulation in the current mode (learn or quiz)
     runBtn.addEventListener('click', () => {
         if (!selectedInstruction) return;
+        clearAccumulatedWires();
         startSimulation(selectedInstruction);
         setComponentPopupsEnabled(false);
         setRunning(true);
@@ -115,8 +132,8 @@ export function initPanels() {
         else startQuiz(finishSimulation);
     });
 
-    // Step simulation forward one cycle
-    // Only active while simulation is running
+    // Step button — advances the simulation by one step
+    // Only active while a simulation is running
     stepBtn.addEventListener('click', () => {
         if (!selectedInstruction) return;
         if (!runBtn.disabled) return;
@@ -134,7 +151,7 @@ export function initPanels() {
         }
     });
 
-    // Mode toggle — learn
+    // Mode toggle — Learn
     learnToggle.addEventListener('click', () => {
         if (runBtn.disabled) return; // Lock mode when sim is running
         learnToggle.classList.add('active');
@@ -143,7 +160,7 @@ export function initPanels() {
         setMode('learn');
     });
 
-    // Mode toggle — quiz
+    // Mode toggle — Quiz
     quizToggle.addEventListener('click', () => {
         if (runBtn.disabled) return; // Lock mode when sim is running
         quizToggle.classList.add('active');
@@ -152,7 +169,7 @@ export function initPanels() {
         setMode('quiz');
     });
 
-    // Resets page to base state
+    // Reset button — returns the page to its base state
     resetBtn.addEventListener('click', () => {
         activateButton(noneBtn);
         learnToggle.classList.add('active');
@@ -162,6 +179,7 @@ export function initPanels() {
         resetSimulation();
         hideSimPopup();
         setComponentPopupsEnabled(true);
+        clearAccumulatedWires();
         resetWires();
         setRunning(false);
     });
