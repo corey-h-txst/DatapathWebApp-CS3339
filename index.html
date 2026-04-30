@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+    <!-- Top navigation bar -->
     <header class="topbar">
         <span class="topbar__title">Datapath Visualizer</span>
         <nav class="topbar__nav">
@@ -16,7 +17,7 @@
             <a href="#" id="nav-about">About</a>
         </nav>
     </header>
-
+    <!-- HOME -->
     <div id="home-screen" class="active">
         <div class="home-container">
             <h1 class="home-title">Datapath Visualizer</h1>
@@ -29,7 +30,7 @@
             </div>
             <div class="home-preview">
                 <div class="preview-box">
-                    Datapath Visualization Preview
+                    <canvas id="datapath-preview"></canvas>
                 </div>
             </div>
             <div class="home-features">
@@ -48,23 +49,22 @@
             </div>
         </div>
     </div>
-
+    <!-- SIMULATOR -->
     <div id="simulator">
         <div class="layout">
             <aside class="sidebar">
                 <section class="panel">
                     <h2 class="panel__heading">Mode</h2>
                     <div class="mode-toggle" id="mode-toggle-container">
-                        <div class="toggle-slider"></div>
-                        <button id="learn-toggle" class="toggle-btn active">Learn</button>
+                        <div class="toggle-slider"></div> <button id="learn-toggle" class="toggle-btn active">Learn</button>
                         <button id="quiz-toggle" class="toggle-btn">Quiz</button>
                     </div>
                 </section>
                 <section class="panel" id="controls-panel">
                     <h2 class="panel__heading">Simulation Controls</h2>
-                    <button id="run-btn" class="control-btn">Run</button>
-                    <button id="step-btn" class="control-btn">Step</button>
-                    <button id="reset-btn" class="control-btn">Reset</button>
+                    <button class="control-btn" id="run-btn">Run</button>
+                    <button class="control-btn" id="step-btn">Step</button>
+                    <button class="control-btn" id="reset-btn">Reset</button>
                 </section>
                 <section class="panel" id="instruction-types-panel">
                     <h2 class="panel__heading">SELECT INSTRUCTION</h2>
@@ -83,22 +83,141 @@
             </main>
         </div>
     </div>
-
+    <!-- LEARN -->
     <div id="learn-page">
         <div class="content-page">
-            <h1>Learn</h1>
-            <p>Explain datapath concepts here.</p>
+            <h1>Learn Datapath Concepts</h1>
+            <p>
+                Explore the core components of a CPU datapath. Each block plays a role in how
+                instructions are executed and how data flows through the processor. You can explore and
+                learn what each component does with the program and what it can do as the data flows.
+            </p>
+            <div class="learn-grid">
+                <div class="learn-section-title">Datapath Components</div>
+                <div class="learn-card">
+                    <h3>Program Counter (PC)</h3>
+                    <p>Stores the address of the next instruction. It updates every cycle to keep execution moving.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>Instruction Memory</h3>
+                    <p>Holds the program instructions. The PC provides an address to fetch the current instruction.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>Register File</h3>
+                    <p>A small, fast storage unit that holds temporary values used during execution.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>Data Memory</h3>
+                    <p>Stores data for load and store instructions, allowing the CPU to read and write memory.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>ALU</h3>
+                    <p>Performs arithmetic and logical operations such as addition, subtraction, and comparison.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>Multiplexer (MUX)</h3>
+                    <p>Selects one input from multiple options based on a control signal.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>Adder (ADD)</h3>
+                    <p>Adds values together. Often used to increment the PC or calculate addresses.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>Control Unit</h3>
+                    <p>Generates control signals that determine how each part of the datapath behaves.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>Shift Left</h3>
+                    <p>Shifts bits to the left (usually by 2) to align addresses for branching.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>Sign Extend</h3>
+                    <p>Expands a smaller signed value to a larger size while preserving its sign.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>ALU Control</h3>
+                    <p>Determines the specific operation the ALU should perform based on the instruction.</p>
+                </div>
+                <div class="learn-section-title">Instruction Types</div>
+                <div class="learn-card">
+                    <h3>Load</h3>
+                    <p>Reads data from memory and stores it into a register.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>Store</h3>
+                    <p>Writes data from a register into memory.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>Branch</h3>
+                    <p>Changes execution flow based on a condition, such as equality.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>Jump</h3>
+                    <p>Unconditionally moves execution to a new instruction address.</p>
+                </div>
+                <div class="learn-section-title">Operations</div>
+                <div class="learn-card">
+                    <h3>ADD</h3>
+                    <p>Adds two values together for arithmetic or address calculation.</p>
+                </div>
+                <div class="learn-card">
+                    <h3>SUB</h3>
+                    <p>Subtracts one value from another, often used for comparisons.</p>
+                </div>
+            </div>
         </div>
     </div>
-
+    <!-- ABOUT -->
     <div id="about-page">
-        <div class="content-page">
-            <h1>About</h1>
-            <p>Info about your project and team goes here.</p>
+        <div class="about-container">
+            <h1 class="about-title">About Datapath Visualizer</h1>
+            <p class="about-description">
+                The Datapath Visualizer is a conceptual learning tool that demonstrates how a CPU
+                processes instructions through a datapath. It focuses on visualizing how data moves
+                between key components such as the PC, Instruction Memory, Register File, ALU,
+                and Memory in a simplified but structured flow.
+            </p>
+            <div class="about-preview">
+                <div class="about-preview-box">
+                    <img 
+                        src="pictures/datapath-preview.png" 
+                        alt="Datapath Visualizer Preview"
+                        class="about-preview-img"
+                    />
+                </div>
+            </div>
+            <div class="about-section">
+                <h2>What This App Does</h2>
+                <ul>
+                    <li>𖧋 Visualizes datapath execution step-by-step</li>
+                    <li>𖧋 Provides a guided learning mode</li>
+                    <li>𖧋 Includes quiz-based challenges</li>
+                </ul>
+            </div>
+            <div class="about-section">
+                <h2>Teams:</h2>
+                <div class="team-grid">
+                    <div class="team-card">
+                        <strong>Corey Hanna</strong>
+                        <span>Project Lead</span>
+                        <p>Frontend Developer • DevOps</p>
+                    </div>
+                    <div class="team-card">
+                        <strong>Robert Zamora</strong>
+                        <span>Web Developer</span>
+                        <p>UI/UX • Datapath Research</p>
+                    </div>
+                    <div class="team-card">
+                        <strong>Jaime Martinez</strong>
+                        <span>Frontend Developer</span>
+                        <p>UI/UX • Datapath Research</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
     <script src="https://unpkg.com/konva@9/konva.min.js"></script>
     <script type="module" src="pages/router.js"></script>
+    <script type="module" src="pages/home.js"></script>
 </body>
 </html>
