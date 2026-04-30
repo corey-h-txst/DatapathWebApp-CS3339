@@ -148,7 +148,7 @@ Supports 5 core instruction types:
 ### Wires
 - `datapath/wires.js`  
 - 26 permanent data-flow wires  
-- # control wires (WIP)  
+- __ control wires (WIP)  
 - Maintains cumulative state across simulation steps  
 
 ### Instruction Definitions
