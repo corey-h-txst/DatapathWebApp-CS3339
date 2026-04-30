@@ -1,3 +1,23 @@
+/**
+ * branch.js
+ *
+ * Defines the Branch instruction simulation data for the Datapath Visualizer.
+ * This instruction walks through the datapath for a branch-if-equal (beq) operation.
+ *
+ * Wire state notation:
+ *   { id: 'wire-id', state: 0|1, animate: true|false, direction: 'forward'|'reverse' }
+ *   - state: 0 or 1 for control wires (determines dashed color)
+ *   - animate: whether to show the pulsing animation on this wire
+ *   - direction: which direction the pulse travels
+ *
+ * Each step includes:
+ *   - componentId: The datapath component to focus on
+ *   - wires: Wire state declarations for highlighting/animation
+ *   - camera: Optional camera configuration (wireIds, pathPoints, scale, durationMs)
+ *   - tour: Educational content for learn mode
+ *   - quiz: Question data for quiz mode
+ */
+
 export const branchInstruction = {
     id: 'branch',
     label: 'Branch Instruction',
@@ -20,6 +40,7 @@ export const branchInstruction = {
                 answer: 1,
             }
         },
+
         // Step 2
         {
             componentId: 'instruction-mem',
