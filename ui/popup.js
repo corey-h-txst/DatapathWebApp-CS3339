@@ -36,19 +36,31 @@ export function setComponentPopupsEnabled(enabled) { allowComponentPopup = enabl
 export function initPopup() {
     popupElement = document.createElement('div');
     popupElement.id = 'component-popup';
+    popupElement.className = 'sim-popup sim-popup--component sim-popup--hidden';
+
     popupElement.innerHTML = `
-        <div class="popup__handle">
-            <button class="popup__close" aria-label="Close">✕</button>
+        <div class="sim-popup__handle">
+            <span class="sim-popup__drag-hint">⠿ drag</span>
+            <button class="sim-popup__close" aria-label="Close">✕</button>
         </div>
-        <h3 class="popup__title"></h3>
-        <p class="popup__body"></p>
+        <div class="sim-popup__body">
+            <div class="sim-popup__title"></div>
+            <div class="sim-popup__text"></div>
+        </div>
     `;
-    popupElement.style.display = 'none';
 
     document.querySelector('.canvas-wrapper').appendChild(popupElement);
-    popupElement.querySelector('.popup__close').addEventListener('click', hidePopup);
 
-    _makeDraggable(popupElement, popupElement.querySelector('.popup__handle'));
+    const handle = popupElement.querySelector('.sim-popup__handle');
+    const closeBtn = popupElement.querySelector('.sim-popup__close');
+
+    closeBtn.addEventListener('mousedown', e => e.stopPropagation());
+    closeBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        hidePopup();
+    });
+
+    _makeDraggable(popupElement, handle);
 }
 
 /**
@@ -62,9 +74,10 @@ export function showPopup(def, nativeEvent) {
     if (!popupElement) return;
     if (!allowComponentPopup) return;
 
-    popupElement.querySelector('.popup__title').textContent = def.label;
-    popupElement.querySelector('.popup__body').textContent  = def.info ?? '';
-    popupElement.style.display = 'block';
+    popupElement.querySelector('.sim-popup__title').textContent = def.label;
+    popupElement.querySelector('.sim-popup__text').textContent  = def.info ?? '';
+    popupElement.classList.remove('sim-popup--hidden');
+
     if (nativeEvent) _positionNearCursor(popupElement, nativeEvent);
 }
 
@@ -73,7 +86,7 @@ export function showPopup(def, nativeEvent) {
  * Called by the close button and by the global stage click dismiss handler.
  */
 export function hidePopup() {
-    if (popupElement) popupElement.style.display = 'none';
+    if (popupElement) popupElement.classList.add('sim-popup--hidden');
 }
 
 // ── Simulation popup (large, draggable) ──────────────────────────────────────
