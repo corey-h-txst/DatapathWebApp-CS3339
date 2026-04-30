@@ -175,7 +175,7 @@ Supports 5 core instruction types:
 
 ```plaintext
 index.html              Main HTML file containing all page sections
-style.css               Complete dark-theme stylesheet
+style.css               Complete stylesheet
 
 src/
   main.js               Application entry point
@@ -194,7 +194,7 @@ instructions/
   jump.js               Jump instruction (15 steps)
 
 pages/
-  router.js             SPA routing system
+  router.js             Routing system
   home.js               Home page animation
   simulator.js          Simulator controls initialization
   about.js              About page content
