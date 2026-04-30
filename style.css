@@ -839,16 +839,6 @@ ul { list-style: none; }
     max-width: 400px;
 }
 
-
-#home-screen {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: calc(100dvh - var(--topbar-height));
-    text-align: center;
-    background: radial-gradient(circle at top, #151826, #0d0f14);
-  
 .run-dot {
     width: 8px;
     height: 8px;

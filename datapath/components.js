@@ -398,6 +398,8 @@ function _themeForCategory(category) {
     };
 }
 function _makeLabel(text, x, y, width, height, fontSize=34) {
+    const textHeight = 14;
+    const lineHeight = 1;
     return new Konva.Text({
         x,
         y: y + (height - textHeight) / 2,
