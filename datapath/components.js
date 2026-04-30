@@ -48,142 +48,141 @@ const MUX_HEIGHT = 140;
  * @type {Object<string, ComponentDef>}
  */
 const COMPONENTS = {
-    'pc' : {
+    'pc': {
         label: 'Program Counter (PC)',
         canvasLabel: 'PC',
         shape: 'rect',
         category: 'register',
         x: 40, y: 700, width: 100, height: 200,
-        info: 'placeholder',
+        info: 'The Program Counter stores the address of the next instruction to fetch. During normal execution it usually moves to PC + 4, but for a branch or jump it can be updated with a different target address.',
     },
 
-    'instruction-mem' : {
+    'instruction-mem': {
         label: 'Instruction Memory',
         canvasLabel: 'Instruction\nMemory',
         shape: 'rect',
         category: 'memory',
         x: 275, y: 600, width: 400, height: 400,
-        info: 'placeholder',
+        info: 'Instruction memory uses the address from the PC to fetch the current instruction. Its output is the 32-bit instruction, which is then split into fields such as opcode, rs, rt, rd, funct, and immediate bits.',
     },
 
-    'mux-reg-dst' : {
+    'mux-reg-dst': {
         label: 'Multiplexer (MUX) - Register Destination',
         canvasLabel: 'M\nU\nX',
         shape: 'mux',
         category: 'mux',
         x: 840, y: 780,
-        info: 'placeholder',
+        info: 'This multiplexer chooses which register number will be used as the destination for write-back. In a typical single-cycle datapath, it selects between rt for I-type instructions like loads and rd for R-type ALU instructions.',
     },
 
-    'reg-file' : {
+    'reg-file': {
         label: 'Register File',
         canvasLabel: 'Register\nFile',
         shape: 'rect',
         category: 'register',
         x: 900, y: 600, width: 400, height: 400,
-        info: 'placeholder',
+        info: 'The register file stores the CPU’s general-purpose registers. It can read two source registers at the same time and write one destination register during write-back.',
     },
 
-    'sign-ext' : {
+    'sign-ext': {
         label: 'Sign Extend',
         canvasLabel: 'Sign\nExtend',
         shape: 'circle',
         category: 'logic',
         x: 1100, y: 1100,
-        info: 'placeholder',
+        info: 'The sign-extend unit takes a 16-bit immediate value and expands it to 32 bits while preserving its sign. This is important for instructions that use offsets or immediate operands, especially when the value can be negative.',
     },
 
-    'mux-alu-src' : {
+    'mux-alu-src': {
         label: 'Multiplexer (MUX) - ALU Source',
         canvasLabel: 'M\nU\nX',
         shape: 'mux',
         category: 'mux',
         x: 1420, y: 820,
-        info: 'placeholder',
+        info: 'This multiplexer chooses the ALU’s second input. It selects either the second register value or the sign-extended immediate, depending on the instruction type.',
     },
 
-    'alu' : {
+    'alu': {
         label: 'Arithmetic Logic Unit (ALU)',
         canvasLabel: 'A\nL\nU',
         shape: 'alu',
         category: 'alu',
         x: 1500, y: 675,
-        info: 'placeholder',
+        info: 'The ALU performs arithmetic and logic operations such as add, subtract, AND, OR, and set-on-less-than. It is also used to calculate effective memory addresses and compare register values for branches.',
     },
 
-    'alu-control' : {
+    'alu-control': {
         label: 'ALU Control',
         canvasLabel: 'ALU\nControl',
         shape: 'circle',
         category: 'control',
         x: 1440, y: 1150,
-        info: 'placeholder',
+        info: 'ALU Control tells the ALU exactly which operation to perform. It combines the high-level ALUOp signal from the main control unit with instruction-specific function bits when needed.',
     },
 
-    'data-mem' : {
+    'data-mem': {
         label: 'Data Memory',
         canvasLabel: 'Data\nMemory',
         shape: 'rect',
         category: 'memory',
         x: 1650, y: 600, width: 400, height: 400,
-        info: 'placeholder',
+        info: 'Data memory is used by load and store instructions. The ALU provides the memory address, stores write register data into memory, and loads read data out so it can be written back to a register.',
     },
 
-    'mux-mem-to-reg' : {
+    'mux-mem-to-reg': {
         label: 'Multiplexer (MUX) - Memory to Register',
         canvasLabel: 'M\nU\nX',
         shape: 'mux',
         category: 'mux',
         x: 2150, y: 750,
-        info: 'placeholder',
+        info: 'This multiplexer chooses what value will be written back into the register file. It usually selects between the ALU result and the value read from data memory.',
     },
 
-    'control' : {
+    'control': {
         label: 'Control',
         canvasLabel: 'Control',
         shape: 'circle',
         category: 'control',
         x: 800, y: 280,
-        info: 'placeholder',
+        info: 'The main control unit reads the instruction opcode and generates the control signals for the datapath. These signals decide things like register writes, memory reads or writes, ALU behavior, and multiplexer selections.',
     },
 
-    'adder-pc' : {
+    'adder-pc': {
         label: 'Add',
         canvasLabel: 'A\nD\nD',
         shape: 'alu',
         category: 'alu',
         x: 400, y: 100,
-        info: 'placeholder',
+        info: 'This adder computes PC + 4, which is the address of the next sequential instruction. Since each instruction is 4 bytes long, adding 4 moves to the next instruction in memory.',
     },
 
-    'shift-left-2' : {
+    'shift-left-2': {
         label: 'Shift\nLeft 2',
         canvasLabel: 'Shift',
         shape: 'circle',
         category: 'logic',
         x: 1400, y: 250,
-        info: 'placeholder',
+        info: 'This unit shifts the branch offset left by 2 bits. That converts the word offset into a byte offset so it matches instruction address alignment.',
     },
 
-    'adder-branch' : {
+    'adder-branch': {
         label: 'Add',
         canvasLabel: 'A\nD\nD',
         shape: 'alu',
         category: 'alu',
         x: 1650, y: 80,
-        info: 'placeholder',
+        info: 'This adder computes the branch target address by adding PC + 4 to the shifted branch offset. If the branch condition is true, that result becomes the next PC value.',
     },
 
-    'mux-pc-src' : {
+    'mux-pc-src': {
         label: 'Multiplexer (MUX) - PC Source',
         canvasLabel: 'M\nU\nX',
         shape: 'mux',
         category: 'mux',
         x: 1850, y: 110,
-        info: 'placeholder',
+        info: 'This multiplexer chooses the next value loaded into the Program Counter. It selects between the normal sequential path and an alternate path such as a branch target or jump target.',
     },
-};
-
+}
 // ── Initialization ───────────────────────────────────────────────────────────
 
 /**
@@ -451,13 +450,13 @@ function _addRegisterFile(group, def) {
     group.add(_makeLabel('Register\nFile', 110, 110, 180, 140, 35));
 
     // Left-side labels
-    group.add(_makePortLabel('Read\nReg 1', 10, 25, 95, 60, 'left'));
-    group.add(_makePortLabel('Read\nReg 2', 10, 115, 95, 60, 'left'));
-    group.add(_makePortLabel('Write\nReg', 10, 205, 95, 60, 'left'));
+    group.add(_makePortLabel('Read\nReg 1', 10, 85, 95, 60, 'left'));
+    group.add(_makePortLabel('Read\nReg 2', 10, 140, 95, 60, 'left'));
+    group.add(_makePortLabel('Write\nReg', 10, 215, 95, 60, 'left'));
 
     // Right-side labels
     group.add(_makePortLabel('Read\nData 1', 295, 90, 95, 60, 'right'));
-    group.add(_makePortLabel('Read\nData 2', 295, 250, 95, 60, 'right'));
+    group.add(_makePortLabel('Read\nData 2', 295, 300, 95, 60, 'right'));
 
     // Bottom label
     group.add(_makePortLabel('Write\nData', 10, 320, 160, 55, 'left'));
@@ -483,8 +482,8 @@ function _addDataMemory(group, def) {
     group.add(_makeLabel('Data\nMemory', 150, 45, 190, 90, 35));
 
     // Left-side labels
-    group.add(_makePortLabel('Address', 10, 75, 95, 35, 'left'));
-    group.add(_makePortLabel('Write Data', 10, 275, 150, 40, 'left'));
+    group.add(_makePortLabel('Address', 10, 180, 95, 35, 'left'));
+    group.add(_makePortLabel('Write Data', 10, 350, 150, 40, 'left'));
 
     // Right-side label
     group.add(_makePortLabel('Read Data', 255, 175, 125, 40, 'right'));
@@ -568,7 +567,7 @@ function _addCircle(group, def) {
         listening: false,
     }));
 
-    group.add(_makeLabel(def.canvasLabel, 0, 0, CIRCLE_DIAMETER, CIRCLE_DIAMETER, 24));
+    group.add(_makeLabel(def.canvasLabel, 0, -15, CIRCLE_DIAMETER, CIRCLE_DIAMETER, 24));
 }
 
 /**
@@ -601,7 +600,7 @@ function _addALU(group, def) {
         strokeWidth: 1,
         listening: false,
     }));
-    group.add(_makeLabel(def.canvasLabel, 10, 0, ALU_WIDTH, ALU_HEIGHT, 30));
+    group.add(_makeLabel(def.canvasLabel, 5, -35, ALU_WIDTH, ALU_HEIGHT, 30));
 }
 
 /**
@@ -642,7 +641,7 @@ function _addMUX(group, def) {
         listening: false,
     }));
 
-    group.add(_makeLabel(def.canvasLabel, 0, 0, MUX_WIDTH, MUX_HEIGHT, 30));
+    group.add(_makeLabel(def.canvasLabel, 0, -35, MUX_WIDTH, MUX_HEIGHT, 30));
 }
 
 // ── Color mapping ────────────────────────────────────────────────────────────
