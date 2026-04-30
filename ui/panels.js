@@ -15,7 +15,7 @@
 import { setMode, getMode, startSimulation, resetSimulation, advance, getCurrentStep } from '../src/state.js';
 import { startTour, renderTourStep } from './tour.js';
 import { startQuiz, renderQuizStep } from './quiz.js';
-import { hideSimPopup, setComponentPopupsEnabled } from './popup.js';
+import { hidePopup, hideSimPopup, setComponentPopupsEnabled } from './popup.js';
 import { resetWires, clearAccumulatedWires } from '../datapath/wires.js';
 
 import { aluInstruction } from '../instructions/alu.js';
@@ -177,6 +177,7 @@ export function initPanels() {
         toggleContainer.classList.remove('quiz-mode');
         setMode('learn');
         resetSimulation();
+        hidePopup();
         hideSimPopup();
         setComponentPopupsEnabled(true);
         clearAccumulatedWires();
