@@ -20,7 +20,7 @@ import { showPopup, hidePopup } from "../ui/popup.js";
 
 const CIRCLE_RADIUS = 60;
 const CIRCLE_DIAMETER = CIRCLE_RADIUS * 2;
-const ALU_WIDTH = 55;
+const ALU_WIDTH = 45;
 const ALU_HEIGHT = 250;
 const MUX_WIDTH = 40;
 const MUX_HEIGHT = 140;
@@ -289,14 +289,24 @@ function _buildGroup(id, def) {
 
     // Add the appropriate shape based on the component's shape type
     switch (def.shape) {
-        case 'rect':   _addRect(group, def);   break;
-        case 'circle': _addCircle(group, def); break;
-        case 'alu':    _addALU(group, def);    break;
-        case 'mux':    _addMUX(group, def);    break;
+        case 'rect':
+            if (id === 'reg-file') _addRegisterFile(group, def);
+            else if (id === 'instruction-mem') _addInstructionMemory(group, def);
+            else if (id === 'data-mem') _addDataMemory(group, def);
+            else _addRect(group, def);
+            break;
+        case 'circle':
+            _addCircle(group, def);
+            break;
+        case 'alu':
+            _addALU(group, def);
+            break;
+        case 'mux':
+            _addMUX(group, def);
+            break;
     }
 
     _attachInteraction(group, id);
-
     return group;
 }
 
@@ -339,11 +349,55 @@ function _attachInteraction(group, id) {
  * @param {number} fontSize - Font size in pixels
  * @returns {Konva.Text}
  */
-function _makeLabel(text, x, y, width, height, fontSize = 34) {
-    const lineCount = String(text).split('\n').length;
-    const lineHeight = 1;
-    const textHeight = lineCount * fontSize * lineHeight;
 
+function _themeForCategory(category) {
+    const themes = {
+        control: {
+            stroke: '#ff6b6b',
+            fillTop: '#2b1418',
+            fillBottom: '#13090c',
+            glow: 'rgba(255, 107, 107, 0.28)',
+        },
+        memory: {
+            stroke: '#4da3ff',
+            fillTop: '#12243a',
+            fillBottom: '#08111d',
+            glow: 'rgba(77, 163, 255, 0.28)',
+        },
+        alu: {
+            stroke: '#4cd964',
+            fillTop: '#102917',
+            fillBottom: '#08130b',
+            glow: 'rgba(76, 217, 100, 0.26)',
+        },
+        register: {
+            stroke: '#ffb347',
+            fillTop: '#2d2110',
+            fillBottom: '#140c06',
+            glow: 'rgba(255, 179, 71, 0.28)',
+        },
+        mux: {
+            stroke: '#c084fc',
+            fillTop: '#23132f',
+            fillBottom: '#100819',
+            glow: 'rgba(192, 132, 252, 0.28)',
+        },
+        logic: {
+            stroke: '#2dd4bf',
+            fillTop: '#0d2524',
+            fillBottom: '#071312',
+            glow: 'rgba(45, 212, 191, 0.28)',
+        },
+    };
+
+    return themes[category] ?? {
+        stroke: '#94a3b8',
+        fillTop: '#1f2937',
+        fillBottom: '#0f172a',
+        glow: 'rgba(148, 163, 184, 0.22)',
+    };
+}
+function _makeLabel(text, x, y, width, height, fontSize=34) {
     return new Konva.Text({
         x,
         y: y + (height - textHeight) / 2,
@@ -352,13 +406,116 @@ function _makeLabel(text, x, y, width, height, fontSize = 34) {
         fontSize,
         fontFamily: 'monospace',
         fontStyle: 'bold',
-        fill: 'white',
+        fill: '#f8fafc',
         align: 'center',
         lineHeight,
     });
 }
 
-// ── Shape builders ───────────────────────────────────────────────────────────
+function _makePortLabel(text, x, y, width, height, align = 'left') {
+    return new Konva.Text({
+        x,
+        y,
+        width,
+        height,
+        text,
+        fontSize: 22,
+        fontFamily: 'monospace',
+        fontStyle: 'bold',
+        fill: '#f8fafc',
+        align,
+        verticalAlign: 'middle',
+        lineHeight: 1.0,
+    });
+}
+
+function _addInnerBorder(group, width, height, radius = 12) {
+    group.add(new Konva.Rect({
+        x: 8,
+        y: 8,
+        width: Math.max(0, width - 16),
+        height: Math.max(0, height - 16),
+        cornerRadius: Math.max(0, radius - 3),
+        stroke: 'rgba(255,255,255,0.08)',
+        strokeWidth: 1,
+        listening: false,
+    }));
+}
+
+function _addRegisterFile(group, def) {
+    _addStyledBox(group, def);
+
+    // Main center label
+    group.add(_makeLabel('Register\nFile', 110, 110, 180, 140, 35));
+
+    // Left-side labels
+    group.add(_makePortLabel('Read\nReg 1', 10, 25, 95, 60, 'left'));
+    group.add(_makePortLabel('Read\nReg 2', 10, 115, 95, 60, 'left'));
+    group.add(_makePortLabel('Write\nReg', 10, 205, 95, 60, 'left'));
+
+    // Right-side labels
+    group.add(_makePortLabel('Read\nData 1', 295, 90, 95, 60, 'right'));
+    group.add(_makePortLabel('Read\nData 2', 295, 250, 95, 60, 'right'));
+
+    // Bottom label
+    group.add(_makePortLabel('Write\nData', 10, 320, 160, 55, 'left'));
+}
+
+function _addInstructionMemory(group, def) {
+    _addStyledBox(group, def);
+
+    // Main center label
+    group.add(_makeLabel('Instruction\nMemory', 90, 40, 220, 90, 35));
+
+    // Left-side label
+    group.add(_makePortLabel('Read\nAddress', 10, 170, 85, 60, 'left'));
+
+    // Right-side label
+    group.add(_makePortLabel('Instruction\n[31-0]', 255, 170, 135, 80, 'right'));
+}
+
+function _addDataMemory(group, def) {
+    _addStyledBox(group, def);
+
+    // Main center label
+    group.add(_makeLabel('Data\nMemory', 150, 45, 190, 90, 35));
+
+    // Left-side labels
+    group.add(_makePortLabel('Address', 10, 75, 95, 35, 'left'));
+    group.add(_makePortLabel('Write Data', 10, 275, 150, 40, 'left'));
+
+    // Right-side label
+    group.add(_makePortLabel('Read Data', 255, 175, 125, 40, 'right'));
+}
+
+function _addStyledBox(group, def) {
+    const theme = _themeForCategory(def.category);
+
+    group.add(new Konva.Rect({
+        width: def.width,
+        height: def.height,
+        fillLinearGradientStartPoint: { x: 0, y: 0 },
+        fillLinearGradientEndPoint: { x: 0, y: def.height },
+        fillLinearGradientColorStops: [
+            0, theme.fillTop,
+            1, theme.fillBottom,
+        ],
+        stroke: theme.stroke,
+        strokeWidth: 3,
+        cornerRadius: 12,
+    }));
+
+    _addInnerBorder(group, def.width, def.height, 12);
+}
+
+function _addPortStub(group, x1, y1, x2, y2) {
+    group.add(new Konva.Line({
+        points: [x1, y1, x2, y2],
+        stroke: 'white',
+        strokeWidth: 2,
+        lineCap: 'round',
+    }));
+}
 
 /**
  * Rectangular Component — used for PC, Instruction Memory,
@@ -368,15 +525,7 @@ function _makeLabel(text, x, y, width, height, fontSize = 34) {
  * @param {ComponentDef} def  - Component definition
  */
 function _addRect(group, def) {
-    group.add(new Konva.Rect({
-        width: def.width,
-        height: def.height,
-        fill: '#0d0f14',
-        stroke: _strokeForCategory(def.category),
-        strokeWidth: 2,
-        cornerRadius: 10,
-    }));
-
+    _addStyledBox(group, def);
     group.add(_makeLabel(def.canvasLabel, 0, 0, def.width, def.height));
 }
 
@@ -388,13 +537,33 @@ function _addRect(group, def) {
  * @param {ComponentDef} def  - Component definition
  */
 function _addCircle(group, def) {
+    const radius = 60;
+    const diameter = radius * 2;
+    const theme = _themeForCategory(def.category);
+
     group.add(new Konva.Circle({
-        x: CIRCLE_RADIUS,
-        y: CIRCLE_RADIUS,
-        radius: CIRCLE_RADIUS,
-        fill: '#0d0f14',
-        stroke: _strokeForCategory(def.category),
-        strokeWidth: 2,
+        x: radius,
+        y: radius,
+        radius: radius,
+        fillRadialGradientStartPoint: { x: radius - 18, y: radius - 18 },
+        fillRadialGradientStartRadius: 8,
+        fillRadialGradientEndPoint: { x: radius, y: radius },
+        fillRadialGradientEndRadius: radius,
+        fillRadialGradientColorStops: [
+            0, theme.fillTop,
+            1, theme.fillBottom,
+        ],
+        stroke: theme.stroke,
+        strokeWidth: 3,
+    }));
+
+    group.add(new Konva.Circle({
+        x: radius,
+        y: radius,
+        radius: radius - 8,
+        stroke: 'rgba(255,255,255,0.08)',
+        strokeWidth: 1,
+        listening: false,
     }));
 
     group.add(_makeLabel(def.canvasLabel, 0, 0, CIRCLE_DIAMETER, CIRCLE_DIAMETER, 24));
@@ -408,14 +577,29 @@ function _addCircle(group, def) {
  * @param {ComponentDef} def  - Component definition
  */
 function _addALU(group, def) {
+    const theme = _themeForCategory(def.category);
+
     group.add(new Konva.Line({
         points: [0, 0, ALU_WIDTH, 70, ALU_WIDTH, 180, 0, ALU_HEIGHT, 0, 150, 15, 125, 0, 100],
         closed: true,
-        fill: '#0d0f14',
-        stroke: _strokeForCategory(def.category),
-        strokeWidth: 2,
+        fillLinearGradientStartPoint: { x: 0, y: 0 },
+        fillLinearGradientEndPoint: { x: 55, y: 250 },
+        fillLinearGradientColorStops: [
+            0, theme.fillTop,
+            1, theme.fillBottom,
+        ],
+        stroke: theme.stroke,
+        strokeWidth: 3,
     }));
-    group.add(_makeLabel(def.canvasLabel, 10, 0, ALU_WIDTH - 10, ALU_HEIGHT, 30));
+
+    group.add(new Konva.Line({
+        points: [4, 10, 47, 72, 47, 176, 4, 238, 4, 152, 15, 125, 4, 98],
+        closed: true,
+        stroke: 'rgba(255,255,255,0.08)',
+        strokeWidth: 1,
+        listening: false,
+    }));
+    group.add(_makeLabel(def.canvasLabel, 10, 0, ALU_WIDTH, ALU_HEIGHT, 30));
 }
 
 /**
@@ -427,14 +611,33 @@ function _addALU(group, def) {
  * @param {ComponentDef} def  - Component definition
  */
 function _addMUX(group, def) {
+    const height = 140;
+    const width = 40;
+    const theme = _themeForCategory(def.category);
+
     group.add(new Konva.Rect({
         x: 0, y: 0,
-        width: MUX_WIDTH,
-        height: MUX_HEIGHT,
-        cornerRadius: MUX_WIDTH / 2,
-        fill: '#0d0f14',
-        stroke: _strokeForCategory(def.category),
-        strokeWidth: 2,
+        width: width,
+        height: height,
+        cornerRadius: width / 2,
+        fillLinearGradientStartPoint: { x: 0, y: 0 },
+        fillLinearGradientEndPoint: { x: 0, y: height },
+        fillLinearGradientColorStops: [
+            0, theme.fillTop,
+            1, theme.fillBottom,
+        ],
+        stroke: theme.stroke,
+        strokeWidth: 3,
+    }));
+
+    group.add(new Konva.Rect({
+        x: 5, y: 5,
+        width: width - 10,
+        height: height - 10,
+        cornerRadius: (width - 10) / 2,
+        stroke: 'rgba(255,255,255,0.08)',
+        strokeWidth: 1,
+        listening: false,
     }));
 
     group.add(_makeLabel(def.canvasLabel, 0, 0, MUX_WIDTH, MUX_HEIGHT, 30));
@@ -450,15 +653,7 @@ function _addMUX(group, def) {
  * @returns {string} - CSS color string
  */
 function _strokeForCategory(category) {
-    const colors = {
-        control: 'red',
-        memory: 'blue',
-        alu: 'green',
-        register: 'orange',
-        mux: 'purple',
-        logic: 'teal',
-    };
-    return colors[category] ?? 'black';
+    return _themeForCategory(category).stroke;
 }
 
 // ── Global dismiss ───────────────────────────────────────────────────────────
