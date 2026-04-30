@@ -1,5 +1,5 @@
 const img = new Image();
-img.src = "assets/datapath-preview.png";
+img.src = "pictures/datapath-preview.png";
 img.onload = () => {
     console.log("About preview loaded");
 };
