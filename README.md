@@ -66,6 +66,8 @@ An interactive web application designed to help students understand how CPU data
 - **Robert Zamora** — Web Developer, UI/UX, Datapath Research  
 - **Jaime Martinez** — Frontend Developer, UI/UX, Datapath Research  
 
+> **Note:** AI was used for documentation and debugging purposes
+
 ---
 
 ## Technology Stack
@@ -83,7 +85,8 @@ The project is intentionally lightweight and avoids frameworks to emphasize dire
 ## Features
 
 ### Interactive Datapath Canvas
-- 15 components rendered using Konva.js  
+- 16 components rendered using Konva.js, including a new AND Gate for branch control  
+- "4" constant label displayed on the PC adder input port  
 - Smooth zoom and pan functionality  
 - Camera animations that follow instruction flow  
 
@@ -96,9 +99,11 @@ Supports 5 core instruction types:
 - Jump (`j`)  
 
 ### Animated Wires
-- Permanent data-flow wires with dynamic highlighting  
-- Control wires displayed as dashed, color-coded signals (WIP) 
+- 26 permanent data-flow wires with dynamic highlighting  
+- 20+ control wires displayed as dashed, color-coded signals  
 - Pulsing animations to indicate active data movement  
+- Wire states (active/inactive) maintained cumulatively across simulation steps  
+- Camera animations follow wire paths for step-by-step instruction flow  
 
 ### Camera System
 - Smooth transitions between components  
@@ -136,30 +141,32 @@ Supports 5 core instruction types:
 
 ### Components
 - `datapath/components.js`  
-- Defines 15 datapath components  
+- Defines 16 datapath components, including an AND Gate for branch control  
 - Supports multiple shapes:
   - Rectangle  
   - Circle  
   - ALU Chevron  
   - MUX Pill  
+  - AND Gate
 - Color-coded by category:
   - Control, Memory, ALU, Register, MUX, Logic  
 
 ### Wires
 - `datapath/wires.js`  
 - 26 permanent data-flow wires  
-- __ control wires (WIP)  
+- 20+ control wires displayed as dashed, color-coded signals  
 - Maintains cumulative state across simulation steps  
+- Wire animations follow instruction-specific paths with camera tracking  
 
 ### Instruction Definitions
 - `instructions/`  
 - Each instruction includes:
-  - Every instruction step  
-  - Active components  
-  - Wire states  
-  - Camera targets  
-  - Tour explanations  
-  - Quiz questions  
+  - Every instruction step with wire animations and camera targets  
+  - Active components with highlighted data paths  
+  - Wire states (active/inactive) for both data-flow and control wires  
+  - Camera targets for smooth step-by-step transitions  
+  - Tour explanations with educational content  
+  - Quiz questions with immediate feedback  
 
 ### UI Layer
 - `ui/`  
@@ -167,7 +174,7 @@ Supports 5 core instruction types:
   - Panels and controls  
   - Popups and overlays  
   - Tour and quiz logic  
-  - Camera step resolution  
+  - Camera step resolution with control wire fan-out mapping
 
 ---
 
@@ -175,7 +182,7 @@ Supports 5 core instruction types:
 
 ```plaintext
 index.html              Main HTML file containing all page sections
-style.css               Complete stylesheet
+style.css               Complete dark-theme stylesheet
 
 src/
   main.js               Application entry point
@@ -194,7 +201,7 @@ instructions/
   jump.js               Jump instruction (15 steps)
 
 pages/
-  router.js             Routing system
+  router.js             SPA routing system
   home.js               Home page animation
   simulator.js          Simulator controls initialization
   about.js              About page content
