@@ -141,20 +141,38 @@ const WIRE_DEFS = {
         points: [760, 800, 760, 1160, 1100, 1160],
     },
 
-    // ── Control signals (dashed, hidden by default) ──────────────────────────
-    'control-to-reg-file':       { type: 'control', points: [880, 340, 880, 550, 1100, 550, 1100, 650] },
-    'control-to-mux-reg-dst':    { type: 'control', points: [860, 340, 860, 780] },
-    'control-to-mux-alu-src':    { type: 'control', points: [870, 360, 1050, 360, 1050, 500, 1440, 500, 1440, 820] },
-    'control-to-alu-control':    { type: 'control', wireStyle: 'aluControl', points: [880, 380, 950, 380, 950, 525, 1360, 525, 1360, 1200, 1500, 1200] },
-    'control-to-data-mem':       { type: 'control', points: [870, 320, 1280, 320, 1280, 400, 1850, 400, 1850, 600] },
-    'control-to-mux-mem-to-reg': { type: 'control', points: [850, 300, 1300, 300, 1300, 380, 2170, 380, 2170, 750] },
-    'control-to-and-gate':       { type: 'control', points: [880, 340, 1150, 340, 1150, 460, 1570, 460] },
+    // ── Control → Register File ──────────────────────────────────────────────
+    'control-to-reg-file':       { type: 'control', points: [880, 340, 880, 550, 1100, 550, 1100, 650] }, // (Hidden by Default)
+
+    // ── Control → MUX Reg-Dst ────────────────────────────────────────────────
+    'control-to-mux-reg-dst':    { type: 'control', points: [860, 340, 860, 780] }, // (Hidden by Default)
+
+    // ── Control → MUX ALU-Src ────────────────────────────────────────────────
+    'control-to-mux-alu-src':    { type: 'control', points: [870, 360, 1050, 360, 1050, 500, 1440, 500, 1440, 820] }, // (Hidden by Default)
+
+    // ── Control → ALU Control ────────────────────────────────────────────────
+    'control-to-alu-control':    { type: 'control', wireStyle: 'aluControl', points: [880, 380, 950, 380, 950, 525, 1360, 525, 1360, 1200, 1500, 1200] }, // (Hidden by Default, ALU Control style)
+
+    // ── Control → Mem Write ──────────────────────────────────────────────────
+    'control-to-mem-write':      { type: 'control', points: [870, 320, 1280, 320, 1280, 400, 1850, 400, 1850, 600] }, // (Hidden by Default)
+
+    // ── Control → Mem Read ───────────────────────────────────────────────────
+    'control-to-mem-read':       { type: 'control', points: [880, 330, 1260, 330, 1260, 420, 1800, 420, 1800, 600] }, // (Hidden by Default)
+
+    // ── Control → MUX Mem-To-Reg ─────────────────────────────────────────────
+    'control-to-mux-mem-to-reg': { type: 'control', points: [850, 300, 1300, 300, 1300, 380, 2170, 380, 2170, 750] }, // (Hidden by Default)
+
+    // ── Control → AND Gate ───────────────────────────────────────────────────
+    'control-to-and-gate':       { type: 'control', points: [880, 340, 1150, 340, 1150, 460, 1570, 460] }, // (Hidden by Default)
+
+    // ── Control → Jump ───────────────────────────────────────────────────────
+    'control-to-jump':           { type: 'control', points: [860, 300, 860, 65, 1870, 65, 1870, 130] }, // (Hidden by Default)
 
     // ── ALU Zero → AND Gate ──────────────────────────────────────────────────
-    'alu-zero-to-and-gate':      { type: 'control', points: [1522, 675, 1522, 520, 1550, 520] },
+    'alu-zero-to-and-gate':      { type: 'control', points: [1522, 800, 1522, 500, 1560, 500] }, // (Hidden by Default)
 
     // ── AND Gate → MUX PC-Src ────────────────────────────────────────────────
-    'and-gate-to-mux-pc-src':    { type: 'control', points: [1650, 410, 1700, 410, 1700, 180, 1870, 180] },
+    'and-gate-to-mux-pc-src':    { type: 'control', points: [1560, 480, 1870, 480, 1870, 180] }, // (Hidden by Default)
 
     // ── Register File Read Data 1 → ALU ──────────────────────────────────────
     'reg-file-read-1-to-alu': {
@@ -209,7 +227,7 @@ const WIRE_DEFS = {
         type: 'control',
         wireStyle: 'aluControl',
         points: [1500, 1210, 1500, 1000, 1525, 1000, 1525, 890],
-    },
+    }, // (Hidden by Default, ALU Control style)
 
     // ── ALU → Result Split ───────────────────────────────────────────────────
     'alu-to-result-split': {
@@ -251,6 +269,12 @@ const WIRE_DEFS = {
     'pc-to-adder-pc': {
         type: 'permanent',
         points: [90, 700, 90, 520, 220, 520, 220, 180, 400, 180],
+    },
+
+    // ── Constant 4 → Adder PC ────────────────────────────────────────────────
+    'constant-4-to-adder-pc': {
+        type: 'permanent',
+        points: [330, 320, 400, 320],
     },
 
     // ── Adder PC → Split ─────────────────────────────────────────────────────

@@ -321,6 +321,11 @@ function _buildGroup(id, def) {
             break;
     }
 
+    // Add "4" port label to the PC adder (adder-pc) — constant value input
+    if (id === 'adder-pc') {
+        group.add(_makePortLabel('4', -100, 205, 30, 30, 'left'));
+    }
+
     _attachInteraction(group, id);
     return group;
 }
