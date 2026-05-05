@@ -80,8 +80,10 @@ export const aluInstruction = {
                 { id: 'control-to-mux-reg-dst', state: 1, animate: true, direction: 'forward' },
                 { id: 'control-to-mux-alu-src', state: 0, animate: true, direction: 'forward' },
                 { id: 'control-to-alu-control', state: 1, animate: true, direction: 'forward' },
-                { id: 'control-to-data-mem', state: 0, animate: true, direction: 'forward' },
+                { id: 'control-to-mem-write', state: 0, animate: true, direction: 'forward' },
+                { id: 'control-to-mem-read', state: 0, animate: true, direction: 'forward' },
                 { id: 'control-to-mux-mem-to-reg', state: 0, animate: true, direction: 'forward' },
+                { id: 'control-to-and-gate', state: 0, animate: true, direction: 'forward' },
             ],
             tour: {
                 title: 'Control',
@@ -102,13 +104,13 @@ export const aluInstruction = {
         {
             componentId: 'mux-reg-dst',
             wires: [
-                { id: 'instruction-split-to-read-2-junction', animate: true, direction: 'forward' },
                 { id: 'instruction-read-2-to-mux-reg-dst', animate: true, direction: 'forward' },
+                { id: 'instruction-split-to-read-2-junction', animate: true, direction: 'forward' },
                 { id: 'mux-reg-dst-to-reg-file-write-reg', animate: true, direction: 'forward' },
                 { id: 'control-to-mux-reg-dst', state: 1, animate: true, direction: 'forward' },
             ],
             camera: {
-                wireIds: ['instruction-split-to-read-2-junction', 'instruction-read-2-to-mux-reg-dst'],
+                wireIds: ['instruction-read-2-to-mux-reg-dst'],
             },
             tour: {
                 title: 'Multiplexer (MUX) - Register Destination',
@@ -189,7 +191,7 @@ export const aluInstruction = {
             },
             tour: {
                 title: 'Multiplexer (MUX) - ALU Source',
-                body: 'This multiplexer decides the ALU’s second input. For an ALU instruction, it selects the second register value instead of the sign-extended immediate.'
+                body: 'This multiplexer decides the ALU\'s second input. For an ALU instruction, it selects the second register value instead of the sign-extended immediate.'
             },
             quiz: {
                 question: 'What does the ALUSrc multiplexer select for an ALU instruction?',
@@ -210,7 +212,7 @@ export const aluInstruction = {
             ],
             tour: {
                 title: 'ALU Control',
-                body: 'ALU control combines the general ALU operation code from the control unit with the instruction’s funct field. This tells the ALU exactly which operation to perform, such as add, subtract, AND, OR, or set-on-less-than.'
+                body: 'ALU control combines the general ALU operation code from the control unit with the instruction\'s funct field. This tells the ALU exactly which operation to perform, such as add, subtract, AND, OR, or set-on-less-than.'
             },
             quiz: {
                 question: 'What information helps ALU control decide the exact ALU operation?',
@@ -255,7 +257,8 @@ export const aluInstruction = {
             wires: [
                 { id: 'alu-to-result-split', animate: true, direction: 'forward' },
                 { id: 'alu-result-split-to-data-mem', animate: true, direction: 'forward' },
-                { id: 'control-to-data-mem', state: 0, animate: true, direction: 'forward' },
+                { id: 'control-to-mem-write', state: 0, animate: true, direction: 'forward' },
+                { id: 'control-to-mem-read', state: 0, animate: true, direction: 'forward' },
             ],
             camera: {
                 wireIds: ['alu-to-result-split', 'alu-result-split-to-data-mem'],
@@ -280,11 +283,11 @@ export const aluInstruction = {
             componentId: 'mux-mem-to-reg',
             wires: [
                 { id: 'alu-to-result-split', animate: true, direction: 'forward' },
-                { id: 'alu-result-split-to-mux-mem-to-reg', animate: true, direction: 'forward' },
+                { id: 'data-mem-to-mux-mem-to-reg', animate: true, direction: 'forward' },
                 { id: 'control-to-mux-mem-to-reg', state: 0, animate: true, direction: 'forward' },
             ],
             camera: {
-                wireIds: ['alu-to-result-split', 'alu-result-split-to-mux-mem-to-reg'],
+                wireIds: ['alu-to-result-split', 'data-mem-to-mux-mem-to-reg'],
             },
             tour: {
                 title: 'Multiplexer (MUX) - Memory to Register',
@@ -331,9 +334,10 @@ export const aluInstruction = {
             componentId: 'adder-pc',
             wires: [
                 { id: 'pc-to-adder-pc', animate: true, direction: 'forward' },
+                { id: 'constant-4-to-adder-pc', animate: true, direction: 'forward' },
             ],
             camera: {
-                wireIds: ['pc-to-adder-pc'],
+                wireIds: ['pc-to-adder-pc', 'constant-4-to-adder-pc'],
             },
             tour: {
                 title: 'Adder - PC + 4',

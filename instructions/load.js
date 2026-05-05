@@ -16,6 +16,8 @@
  *   - camera: Optional camera configuration (wireIds, pathPoints, scale, durationMs)
  *   - tour: Educational content for learn mode
  *   - quiz: Question data for quiz mode
+ *
+ * Control signals for Load: RegDst=0, ALUSrc=1, MemtoReg=1, RegWrite=1, MemRead=1, MemWrite=0, Branch=0
  */
 
 export const loadInstruction = {
@@ -23,9 +25,11 @@ export const loadInstruction = {
     label: 'Load Instruction',
     steps: [
         // Step 1 — Program Counter (PC)
-        // The PC holds the address of the current instruction.
         {
             componentId: 'pc',
+            wires: [
+                { id: 'pc-to-instruction-mem' },
+            ],
             tour: {
                 title: 'Program Counter',
                 body: 'The Program Counter holds the address of the current instruction and sends that address to instruction memory so the CPU can fetch the load instruction.'
@@ -43,9 +47,14 @@ export const loadInstruction = {
         },
 
         // Step 2 — Instruction Memory
-        // The instruction is fetched from memory at the address in the PC.
         {
             componentId: 'instruction-mem',
+            wires: [
+                { id: 'pc-to-instruction-mem', animate: true, direction: 'forward' },
+            ],
+            camera: {
+                wireIds: ['pc-to-instruction-mem'],
+            },
             tour: {
                 title: 'Instruction Memory',
                 body: 'Instruction memory uses the address from the PC to fetch the load instruction. The instruction fields, such as opcode, registers, and immediate offset, are then sent through the datapath.'
@@ -61,9 +70,21 @@ export const loadInstruction = {
                 answer: 1,
             }
         },
-        // Step 3
+        // Step 3 — Control
         {
             componentId: 'control',
+            wires: [
+                { id: 'instruction-mem-to-split', animate: true, direction: 'forward' },
+                { id: 'instruction-split-to-control', animate: true, direction: 'forward' },
+                { id: 'control-to-reg-file', state: 1, animate: true, direction: 'forward' },
+                { id: 'control-to-mux-reg-dst', state: 0, animate: true, direction: 'forward' },
+                { id: 'control-to-mux-alu-src', state: 1, animate: true, direction: 'forward' },
+                { id: 'control-to-alu-control', state: 1, animate: true, direction: 'forward' },
+                { id: 'control-to-mem-write', state: 0, animate: true, direction: 'forward' },
+                { id: 'control-to-mem-read', state: 1, animate: true, direction: 'forward' },
+                { id: 'control-to-mux-mem-to-reg', state: 1, animate: true, direction: 'forward' },
+                { id: 'control-to-and-gate', state: 0, animate: true, direction: 'forward' },
+            ],
             tour: {
                 title: 'Control',
                 body: 'The control unit reads the opcode and recognizes a load instruction. It enables memory read and register write, selects the immediate as an ALU input, and prepares the datapath to write loaded data back into a register.'
@@ -79,9 +100,17 @@ export const loadInstruction = {
                 answer: 1,
             }
         },
-        // Step 4
+        // Step 4 — MUX Reg-Dst
         {
             componentId: 'mux-reg-dst',
+            wires: [
+                { id: 'instruction-split-to-mux-reg-dst', animate: true, direction: 'forward' },
+                { id: 'mux-reg-dst-to-reg-file-write-reg', animate: true, direction: 'forward' },
+                { id: 'control-to-mux-reg-dst', state: 0, animate: true, direction: 'forward' },
+            ],
+            camera: {
+                wireIds: ['instruction-split-to-mux-reg-dst'],
+            },
             tour: {
                 title: 'MUX - Register Destination',
                 body: 'This multiplexer chooses which register will receive the loaded value. For a load instruction, it selects the rt field because that is the destination register in an I-type load format.'
@@ -97,9 +126,17 @@ export const loadInstruction = {
                 answer: 2,
             }
         },
-        // Step 5
+        // Step 5 — Register File
         {
             componentId: 'reg-file',
+            wires: [
+                { id: 'instruction-split-to-reg-file-read-1', animate: true, direction: 'forward' },
+                { id: 'mux-reg-dst-to-reg-file-write-reg' },
+                { id: 'control-to-reg-file', state: 1, animate: true, direction: 'forward' },
+            ],
+            camera: {
+                wireIds: ['instruction-split-to-reg-file-read-1'],
+            },
             tour: {
                 title: 'Register File',
                 body: 'The register file reads the base register named by the instruction. That register value will be used as the starting address for calculating the memory location to load from.'
@@ -115,9 +152,15 @@ export const loadInstruction = {
                 answer: 0,
             }
         },
-        // Step 6
+        // Step 6 — Sign Extend
         {
             componentId: 'sign-ext',
+            wires: [
+                { id: 'instruction-split-to-sign-ext', animate: true, direction: 'forward' },
+            ],
+            camera: {
+                wireIds: ['instruction-split-to-sign-ext'],
+            },
             tour: {
                 title: 'Sign Extend',
                 body: 'The 16 bit offset from the instruction is sign-extended to 32 bits. This keeps the offset correct even if it is negative.'
@@ -133,12 +176,20 @@ export const loadInstruction = {
                 answer: 0,
             }
         },
-        // Step 7
+        // Step 7 — MUX ALU-Src
         {
             componentId: 'mux-alu-src',
+            wires: [
+                { id: 'sign-ext-to-split', animate: true, direction: 'forward' },
+                { id: 'sign-ext-split-to-mux-alu-src', animate: true, direction: 'forward' },
+                { id: 'control-to-mux-alu-src', state: 1, animate: true, direction: 'forward' },
+            ],
+            camera: {
+                wireIds: ['sign-ext-split-to-mux-alu-src'],
+            },
             tour: {
                 title: 'MUX - ALU Source',
-                body: 'This multiplexer chooses the ALU’s second input. For a load instruction, it selects the sign-extended immediate offset instead of a second register value.'
+                body: 'This multiplexer chooses the ALU\'s second input. For a load instruction, it selects the sign-extended immediate offset instead of a second register value.'
             },
             quiz: {
                 question: 'What does ALUSrc select for a load instruction?',
@@ -151,9 +202,12 @@ export const loadInstruction = {
                 answer: 1,
             }
         },
-        // Step 8
+        // Step 8 — ALU Control
         {
             componentId: 'alu-control',
+            wires: [
+                { id: 'control-to-alu-control', state: 1, animate: true, direction: 'forward' },
+            ],
             tour: {
                 title: 'ALU Control',
                 body: 'ALU control tells the ALU what operation to perform. For a load instruction, it selects addition so the base register value and offset can be combined into an effective memory address.'
@@ -169,9 +223,17 @@ export const loadInstruction = {
                 answer: 2,
             }
         },
-        // Step 9
+        // Step 9 — ALU
         {
             componentId: 'alu',
+            wires: [
+                { id: 'reg-file-read-1-to-alu' },
+                { id: 'mux-alu-src-to-alu', animate: true, direction: 'forward' },
+                { id: 'alu-control-to-alu', state: 1, animate: true, direction: 'forward' },
+            ],
+            camera: {
+                wireIds: ['mux-alu-src-to-alu'],
+            },
             tour: {
                 title: 'ALU',
                 body: 'The ALU adds the base register value and the sign-extended offset. The result is the effective address of the memory location the CPU wants to read from.'
@@ -187,9 +249,18 @@ export const loadInstruction = {
                 answer: 1,
             }
         },
-        // Step 10
+        // Step 10 — Data Memory
         {
             componentId: 'data-mem',
+            wires: [
+                { id: 'alu-to-result-split', animate: true, direction: 'forward' },
+                { id: 'alu-result-split-to-data-mem', animate: true, direction: 'forward' },
+                { id: 'control-to-mem-write', state: 0, animate: true, direction: 'forward' },
+                { id: 'control-to-mem-read', state: 1, animate: true, direction: 'forward' },
+            ],
+            camera: {
+                wireIds: ['alu-to-result-split', 'alu-result-split-to-data-mem'],
+            },
             tour: {
                 title: 'Data Memory',
                 body: 'Data memory uses the effective address from the ALU and reads the value stored at that location. This is the actual data being loaded.'
@@ -205,9 +276,16 @@ export const loadInstruction = {
                 answer: 1,
             }
         },
-        // Step 11
+        // Step 11 — MUX Mem-To-Reg
         {
             componentId: 'mux-mem-to-reg',
+            wires: [
+                { id: 'data-mem-to-mux-mem-to-reg', animate: true, direction: 'forward' },
+                { id: 'control-to-mux-mem-to-reg', state: 1, animate: true, direction: 'forward' },
+            ],
+            camera: {
+                wireIds: ['data-mem-to-mux-mem-to-reg'],
+            },
             tour: {
                 title: 'MUX - Memory to Register',
                 body: 'This multiplexer chooses what value gets written back to the register file. For a load instruction, it selects the value coming from data memory rather than the ALU result.'
@@ -223,9 +301,16 @@ export const loadInstruction = {
                 answer: 1,
             }
         },
-        // Step 12
+        // Step 12 — Register File Write Back
         {
             componentId: 'reg-file',
+            wires: [
+                { id: 'mux-mem-to-reg-to-reg-file', animate: true, direction: 'forward' },
+                { id: 'control-to-reg-file', state: 1, animate: true, direction: 'forward' },
+            ],
+            camera: {
+                wireIds: ['mux-mem-to-reg-to-reg-file'],
+            },
             tour: {
                 title: 'Register File Write Back',
                 body: 'The register file writes the loaded memory value into the destination register chosen earlier. This completes the load instruction.'
@@ -241,9 +326,16 @@ export const loadInstruction = {
                 answer: 2,
             }
         },
-        // Step 13
+        // Step 13 — Adder PC
         {
             componentId: 'adder-pc',
+            wires: [
+                { id: 'pc-to-adder-pc', animate: true, direction: 'forward' },
+                { id: 'constant-4-to-adder-pc', animate: true, direction: 'forward' },
+            ],
+            camera: {
+                wireIds: ['pc-to-adder-pc', 'constant-4-to-adder-pc'],
+            },
             tour: {
                 title: 'Adder - PC + 4',
                 body: 'This adder computes PC + 4, which is the address of the next sequential instruction. After the load finishes, execution normally continues there.'
@@ -259,9 +351,16 @@ export const loadInstruction = {
                 answer: 2,
             }
         },
-        // Step 14
+        // Step 14 — MUX PC-Src
         {
             componentId: 'mux-pc-src',
+            wires: [
+                { id: 'adder-pc-to-split', animate: true, direction: 'forward' },
+                { id: 'adder-pc-split-to-mux-pc-src', animate: true, direction: 'forward' },
+            ],
+            camera: {
+                wireIds: ['adder-pc-to-split', 'adder-pc-split-to-mux-pc-src'],
+            },
             tour: {
                 title: 'MUX - PC Source',
                 body: 'This multiplexer chooses the next value for the Program Counter. For a normal load instruction, it selects the standard PC + 4 path rather than a branch or jump target.'
@@ -277,9 +376,15 @@ export const loadInstruction = {
                 answer: 2,
             }
         },
-        // Step 15
+        // Step 15 — Program Counter Update
         {
             componentId: 'pc',
+            wires: [
+                { id: 'mux-pc-src-to-pc', animate: true, direction: 'forward' },
+            ],
+            camera: {
+                wireIds: ['mux-pc-src-to-pc'],
+            },
             tour: {
                 title: 'Program Counter Update',
                 body: 'The Program Counter is updated with PC + 4. The CPU is now ready to fetch the next instruction.'

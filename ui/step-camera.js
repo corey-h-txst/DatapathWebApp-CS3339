@@ -46,6 +46,7 @@ const CONTROL_FANOUT_COMPONENTS = {
     'control-to-alu-control':    'alu-control',
     'control-to-data-mem':       'data-mem',
     'control-to-mux-mem-to-reg': 'mux-mem-to-reg',
+    'control-to-and-gate':       'and-gate',
 };
 
 // ── Main entry point ─────────────────────────────────────────────────────────

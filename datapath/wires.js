@@ -17,6 +17,7 @@
  */
 
 import { getMainLayer } from './canvas.js';
+import { setAndGateVisible } from './components.js';
 
 // ── Style definitions ────────────────────────────────────────────────────────
 
@@ -29,25 +30,41 @@ const WIRE_STYLES = {
     permanent: {
         idle:      { stroke: '#45556a', opacity: 0.55, strokeWidth: 6 },
         active:    { stroke: '#f8fafc', opacity: 1,    strokeWidth: 7 },
-        animation: { stroke: '#22c55e', opacity: 0.95 },
+        animation: { stroke: '#38bdf8', opacity: 0.95 },
     },
     control: {
         hidden: { visible: false, stroke: '#000000', opacity: 0, strokeWidth: 5 },
         0: {
             visible: true,
-            stroke: '#38bdf8',
+            stroke: '#ef4444',
             opacity: 0.95,
             strokeWidth: 5,
-            dash: [14, 12],
+        },
+        1: {
+            visible: true,
+            stroke: '#22c55e',
+            opacity: 0.95,
+            strokeWidth: 5,
+        },
+        animation0: { stroke: '#fca5a5', opacity: 0.9 },
+        animation1: { stroke: '#86efac', opacity: 0.9 },
+    },
+    // Special style for ALU Control wire (distinct from normal control wires)
+    aluControl: {
+        hidden: { visible: false, stroke: '#000000', opacity: 0, strokeWidth: 5 },
+        0: {
+            visible: true,
+            stroke: '#a78bfa',
+            opacity: 0.95,
+            strokeWidth: 5,
         },
         1: {
             visible: true,
             stroke: '#f97316',
             opacity: 0.95,
             strokeWidth: 5,
-            dash: [4, 12],
         },
-        animation0: { stroke: '#7dd3fc', opacity: 0.9 },
+        animation0: { stroke: '#c4b5fd', opacity: 0.9 },
         animation1: { stroke: '#fdba74', opacity: 0.9 },
     },
 };
@@ -124,13 +141,38 @@ const WIRE_DEFS = {
         points: [760, 800, 760, 1160, 1100, 1160],
     },
 
-    // ── Control signals (dashed, hidden by default) ──────────────────────────
-    'control-to-reg-file':       { type: 'control', points: [] },
-    'control-to-mux-reg-dst':    { type: 'control', points: [] },
-    'control-to-mux-alu-src':    { type: 'control', points: [] },
-    'control-to-alu-control':    { type: 'control', points: [] },
-    'control-to-data-mem':       { type: 'control', points: [] },
-    'control-to-mux-mem-to-reg': { type: 'control', points: [] },
+    // ── Control → Register File ──────────────────────────────────────────────
+    'control-to-reg-file':       { type: 'control', points: [880, 340, 880, 550, 1100, 550, 1100, 650] }, // (Hidden by Default)
+
+    // ── Control → MUX Reg-Dst ────────────────────────────────────────────────
+    'control-to-mux-reg-dst':    { type: 'control', points: [860, 340, 860, 780] }, // (Hidden by Default)
+
+    // ── Control → MUX ALU-Src ────────────────────────────────────────────────
+    'control-to-mux-alu-src':    { type: 'control', points: [870, 360, 1050, 360, 1050, 500, 1440, 500, 1440, 820] }, // (Hidden by Default)
+
+    // ── Control → ALU Control ────────────────────────────────────────────────
+    'control-to-alu-control':    { type: 'control', wireStyle: 'aluControl', points: [880, 380, 950, 380, 950, 525, 1360, 525, 1360, 1200, 1500, 1200] }, // (Hidden by Default, ALU Control style)
+
+    // ── Control → Mem Write ──────────────────────────────────────────────────
+    'control-to-mem-write':      { type: 'control', points: [870, 320, 1280, 320, 1280, 400, 1850, 400, 1850, 600] }, // (Hidden by Default)
+
+    // ── Control → Mem Read ───────────────────────────────────────────────────
+    'control-to-mem-read':       { type: 'control', points: [880, 330, 1260, 330, 1260, 420, 1800, 420, 1800, 600] }, // (Hidden by Default)
+
+    // ── Control → MUX Mem-To-Reg ─────────────────────────────────────────────
+    'control-to-mux-mem-to-reg': { type: 'control', points: [850, 300, 1300, 300, 1300, 380, 2170, 380, 2170, 750] }, // (Hidden by Default)
+
+    // ── Control → AND Gate ───────────────────────────────────────────────────
+    'control-to-and-gate':       { type: 'control', points: [880, 340, 1150, 340, 1150, 460, 1570, 460] }, // (Hidden by Default)
+
+    // ── Control → Jump ───────────────────────────────────────────────────────
+    'control-to-jump':           { type: 'control', points: [860, 300, 860, 65, 1870, 65, 1870, 130] }, // (Hidden by Default)
+
+    // ── ALU Zero → AND Gate ──────────────────────────────────────────────────
+    'alu-zero-to-and-gate':      { type: 'control', points: [1522, 800, 1522, 500, 1560, 500] }, // (Hidden by Default)
+
+    // ── AND Gate → MUX PC-Src ────────────────────────────────────────────────
+    'and-gate-to-mux-pc-src':    { type: 'control', points: [1560, 480, 1870, 480, 1870, 180] }, // (Hidden by Default)
 
     // ── Register File Read Data 1 → ALU ──────────────────────────────────────
     'reg-file-read-1-to-alu': {
@@ -183,8 +225,9 @@ const WIRE_DEFS = {
     // ── ALU Control → ALU ────────────────────────────────────────────────────
     'alu-control-to-alu': {
         type: 'control',
-        points: [],
-    },
+        wireStyle: 'aluControl',
+        points: [1500, 1210, 1500, 1000, 1525, 1000, 1525, 890],
+    }, // (Hidden by Default, ALU Control style)
 
     // ── ALU → Result Split ───────────────────────────────────────────────────
     'alu-to-result-split': {
@@ -226,6 +269,12 @@ const WIRE_DEFS = {
     'pc-to-adder-pc': {
         type: 'permanent',
         points: [90, 700, 90, 520, 220, 520, 220, 180, 400, 180],
+    },
+
+    // ── Constant 4 → Adder PC ────────────────────────────────────────────────
+    'constant-4-to-adder-pc': {
+        type: 'permanent',
+        points: [330, 320, 400, 320],
     },
 
     // ── Adder PC → Split ─────────────────────────────────────────────────────
@@ -388,6 +437,11 @@ export function initWires() {
  * @param {{ wires?: Array<{id: string, state?: 0|1|'0'|'1', animate?: boolean, direction?: 'forward'|'reverse'}> } | null} step
  */
 export function applyWireStep(step) {
+    // Remove any previous control wire states — control wires only show specific steps that concern them
+    accumulatedWireStates = accumulatedWireStates.filter(
+        (w) => WIRE_DEFS[w.id]?.type === 'permanent'
+    );
+
     // Merge new wire states into the accumulated list
     for (const wireState of step?.wires ?? []) {
         if (!wireState?.id) continue;
@@ -415,6 +469,21 @@ export function applyWireStep(step) {
     for (const wireState of accumulatedWireStates) {
         setWireState(wireState.id, wireState);
     }
+
+    // Show AND Gate if any of its connected wires are active
+    _updateAndGateVisibility();
+}
+
+/**
+ * Shows or hides the AND Gate based on whether any of its
+ * connected control wires are currently active in the accumulated state.
+ */
+function _updateAndGateVisibility() {
+    const andGateWireIds = ['control-to-and-gate', 'alu-zero-to-and-gate', 'and-gate-to-mux-pc-src'];
+    const anyActive = accumulatedWireStates.some(
+        (w) => andGateWireIds.includes(w.id) && w.state !== undefined
+    );
+    setAndGateVisible(anyActive);
 }
 
 /**
@@ -423,6 +492,7 @@ export function applyWireStep(step) {
  */
 export function clearAccumulatedWires() {
     accumulatedWireStates = [];
+    setAndGateVisible(false);
 }
 
 /**
@@ -459,15 +529,24 @@ export function setWireState(id, state = {}) {
             return;
         }
 
-        const style = WIRE_STYLES.control[controlState];
+        // Use wireStyle if defined (e.g. 'aluControl'), otherwise use 'control'
+        const styleKey = entry.def.wireStyle || 'control';
+        const styleGroup = WIRE_STYLES[styleKey];
+        if (!styleGroup) {
+            _applyDefaultStyle(id);
+            return;
+        }
+
+        const style = styleGroup[controlState];
         entry.baseLine.setAttrs(style);
         entry.baseLine.visible(true);
 
         if (state.animate) {
-            const animationStyle = controlState === 0
-                ? WIRE_STYLES.control.animation0
-                : WIRE_STYLES.control.animation1;
-            _startAnimation(id, animationStyle, state.direction);
+            const animationKey = controlState === 0 ? 'animation0' : 'animation1';
+            const animationStyle = styleGroup[animationKey];
+            if (animationStyle) {
+                _startAnimation(id, animationStyle, state.direction);
+            }
         }
     } else {
         // Permanent wires: brighten and optionally animate
