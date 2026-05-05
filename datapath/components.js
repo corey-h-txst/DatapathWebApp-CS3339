@@ -24,6 +24,8 @@ const ALU_WIDTH = 45;
 const ALU_HEIGHT = 250;
 const MUX_WIDTH = 40;
 const MUX_HEIGHT = 140;
+const AND_WIDTH = 45;
+const AND_HEIGHT = 80;
 
 // ── Component Registry ───────────────────────────────────────────────────────
 
@@ -182,6 +184,15 @@ const COMPONENTS = {
         x: 1850, y: 110,
         info: 'This multiplexer chooses the next value loaded into the Program Counter. It selects between the normal sequential path and an alternate path such as a branch target or jump target.',
     },
+
+    'and-gate': {
+        label: 'AND Gate',
+        canvasLabel: 'AND',
+        shape: 'and',
+        category: 'control',
+        x: 1550, y: 440,
+        info: 'The AND Gate combines the Branch control signal with the ALU Zero flag. If both are active (1), the gate outputs 1 to select the branch target in the PC Source multiplexer, causing a taken branch.',
+    },
 }
 // ── Initialization ───────────────────────────────────────────────────────────
 
@@ -233,6 +244,8 @@ export function getComponentBounds(id) {
             return { x: def.x, y: def.y, width: ALU_WIDTH, height: ALU_HEIGHT };
         case 'mux':
             return { x: def.x, y: def.y, width: MUX_WIDTH, height: MUX_HEIGHT };
+        case 'and':
+            return { x: def.x, y: def.y, width: AND_WIDTH, height: AND_HEIGHT };
         default:
             return {
                 x: def.x,
@@ -302,6 +315,9 @@ function _buildGroup(id, def) {
             break;
         case 'mux':
             _addMUX(group, def);
+            break;
+        case 'and':
+            _addANDGate(group, def);
             break;
     }
 
@@ -642,6 +658,93 @@ function _addMUX(group, def) {
     }));
 
     group.add(_makeLabel(def.canvasLabel, 0, -35, MUX_WIDTH, MUX_HEIGHT, 30));
+}
+
+/**
+ * AND Gate Component — rectangle with a convex semicircular dome on the right side.
+ * Uses a custom Konva.Shape with an actual arc for the semicircular dome.
+ * Hidden by default, shown when branch control is active.
+ *
+ * @param {Konva.Group} group - Group to add shapes into
+ * @param {ComponentDef} def  - Component definition
+ */
+function _addANDGate(group, def) {
+    const theme = _themeForCategory(def.category);
+    const w = AND_WIDTH;
+    const h = AND_HEIGHT;
+    const halfH = h / 2;
+    const domeR = halfH; // dome radius = half height for a proper semicircle
+
+    group.add(new Konva.Shape({
+        sceneFunc: function (context, shape) {
+            context.beginPath();
+            // Start at top-left corner
+            context.moveTo(0, 0);
+            // Top edge (left to right) — goes to the top of the dome arc
+            context.lineTo(w, 0);
+            // Convex semicircular dome on the right (top to bottom)
+            // Arc center at (w, halfH), radius = halfH
+            // Start angle = -π/2 (top), end angle = π/2 (bottom)
+            context.arc(w, halfH, domeR, -Math.PI / 2, Math.PI / 2, false);
+            // Bottom edge (right to left)
+            context.lineTo(0, h);
+            // Left edge (bottom to top)
+            context.lineTo(0, 0);
+            context.closePath();
+            context.fillStrokeShape(shape);
+        },
+        fillLinearGradientStartPoint: { x: 0, y: 0 },
+        fillLinearGradientEndPoint: { x: 0, y: h },
+        fillLinearGradientColorStops: [
+            0, theme.fillTop,
+            1, theme.fillBottom,
+        ],
+        stroke: theme.stroke,
+        strokeWidth: 3,
+    }));
+
+    // Inner border (inset version of the same shape)
+    group.add(new Konva.Shape({
+        sceneFunc: function (context, shape) {
+            const inset = 5;
+            const innerDomeR = domeR - inset;
+            context.beginPath();
+            context.moveTo(inset, inset);
+            context.lineTo(w - inset, inset);
+            context.arc(w - inset, halfH, innerDomeR, -Math.PI / 2, Math.PI / 2, false);
+            context.lineTo(inset, h - inset);
+            context.lineTo(inset, inset);
+            context.closePath();
+            context.fillStrokeShape(shape);
+        },
+        stroke: 'rgba(255,255,255,0.08)',
+        strokeWidth: 1,
+        listening: false,
+    }));
+
+    // Label — centered across the full visual width of the AND Gate (rect + dome)
+    group.add(_makeLabel(def.canvasLabel, 0, 0, AND_WIDTH + AND_HEIGHT / 2, AND_HEIGHT, 24));
+
+    // Start hidden — will be shown when control wires activate it
+    group.visible(false);
+}
+
+/**
+ * Shows or hides the AND Gate component on the canvas.
+ * The AND Gate is hidden by default and only appears when
+ * branch-related control wires are active.
+ *
+ * @param {boolean} visible - Whether the AND Gate should be visible
+ */
+export function setAndGateVisible(visible) {
+    const layer = getMainLayer();
+    if (!layer) return;
+
+    const andGateGroup = layer.findOne('#and-gate');
+    if (andGateGroup) {
+        andGateGroup.visible(visible);
+        layer.batchDraw();
+    }
 }
 
 // ── Color mapping ────────────────────────────────────────────────────────────

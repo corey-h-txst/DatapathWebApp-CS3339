@@ -82,6 +82,7 @@ export const aluInstruction = {
                 { id: 'control-to-alu-control', state: 1, animate: true, direction: 'forward' },
                 { id: 'control-to-data-mem', state: 0, animate: true, direction: 'forward' },
                 { id: 'control-to-mux-mem-to-reg', state: 0, animate: true, direction: 'forward' },
+                { id: 'control-to-and-gate', state: 0, animate: true, direction: 'forward' },
             ],
             tour: {
                 title: 'Control',
