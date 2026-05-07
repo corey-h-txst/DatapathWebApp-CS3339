@@ -22,17 +22,35 @@ An interactive web application designed to help students understand how CPU data
   <img src="pictures/home-page-preview.png" width="700"/>
 </p>
 
+- Abstract datapath animation on page load 
+- Navigation to all main sections  
+
 ### Learn Page
 
 <p align="center">
   <img src="pictures/learn-page-preview.png" width="700"/>
 </p>
 
+- Reference cards for datapath components and instructions  
+- Has toggle to switch to a more understandable Analogy Mode
+
+### Analogy Mode
+
+<p align="center">
+  <img src="pictures/analogy-mode-preview.png" width="700"/>
+</p>
+
+- Real-world analogies to explain datapath concepts  
+- Helps bridge conceptual understanding with technical execution  
+
 ### About Page
 
 <p align="center">
   <img src="pictures/about-page-preview.png" width="700"/>
 </p>
+
+- Project overview and educational goals  
+- Team member information  
 
 ---
 
@@ -220,3 +238,4 @@ pictures/
   about-page-preview.png
   learn-mode-preview.png
   quiz-mode-preview.png
+  analogy-mode-preview.png
